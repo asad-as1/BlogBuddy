@@ -1,38 +1,36 @@
 import React, {useState} from 'react'
-import authService from '../appwrite/auth'
-import {Link ,useNavigate} from 'react-router-dom'
-import {login} from '../store/authSlice'
-import {Button, Input, Logo} from './index.js'
-import {useDispatch} from 'react-redux'
+import {Link, useNavigate} from 'react-router-dom'
+import {Button, Input} from './index.js'
 import {useForm} from 'react-hook-form'
+import axios from "axios"
 
 function Signup() {
-    const navigate = useNavigate()
-    const [error, setError] = useState("")
-    const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    const { register, handleSubmit, reset } = useForm();
+    const navigate = useNavigate();
+    const [error, setError] = useState("");
 
-    const create = async(data) => {
-        setError("")
-        try {
-            const userData = await authService.createAccount(data)
-            if (userData) {
-                const userData = await authService.getCurrentUser()
-                if(userData) dispatch(login(userData));
-                navigate("/")
-            }
-        } catch (error) {
-            setError(error.message)
+    const handleRegister = async (data) => {
+      setError("");
+      try {
+        const res = await axios.post(`http://localhost:5000/user/register`, data);
+        if (res?.status === 201) {
+          alert("Successfully Registered");
+          navigate("/");
         }
-    }
+        else alert("something went wrong");
+      } catch (error) {
+        if(error.response.data.message == "User already exists")
+            setError(error.response.data.message);
+        else setError('Username is already taken')
+        // console.log(error);
+      }
+      reset();
+    };
 
   return (
     <div className="flex items-center justify-center">
             <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
             <div className="mb-2 flex justify-center">
-                    <span className="inline-block w-full max-w-[100px]">
-                        <Logo width="100%" />
-                    </span>
                 </div>
                 <h2 className="text-center text-2xl font-bold leading-tight">Sign up to create account</h2>
                 <p className="mt-2 text-center text-base text-black/60">
@@ -46,8 +44,15 @@ function Signup() {
                 </p>
                 {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
 
-                <form onSubmit={handleSubmit(create)}>
+                <form onSubmit={handleSubmit(handleRegister)}>
                     <div className='space-y-5'>
+                        <Input
+                        label="Username: "
+                        placeholder="Username"
+                        {...register("username", {
+                            required: true,
+                        })}
+                        />
                         <Input
                         label="Full Name: "
                         placeholder="Enter your full name"
@@ -73,6 +78,13 @@ function Signup() {
                         placeholder="Enter your password"
                         {...register("password", {
                             required: true,})}
+                        />
+                        <Input
+                        label='Profile Picture'
+                        type='file'
+                        {...register("profilePicture", {
+                            required: false,  // todo
+                        })}
                         />
                         <Button type="submit" className="w-full">
                             Create Account
