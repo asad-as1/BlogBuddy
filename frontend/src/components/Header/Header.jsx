@@ -1,12 +1,32 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import {Container, LogoutBtn} from '../index'
-import { Link, useNavigate} from 'react-router-dom'
-import {useSelector} from 'react-redux'
+import { useNavigate} from 'react-router-dom'
+import Cookie from "cookies-js"
+import axios from "axios"
+
 
 
 function Header() {
-  const authStatus = useSelector((state) => state.auth.status)
   const navigate = useNavigate()
+  const [authStatus, setAuthStatus] = useState(false);
+  
+  const token = Cookie.get('token')
+
+  useEffect(() => {
+    if (token) {
+      axios.get('/api/check-auth', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(response => {
+        // console.log(response)
+        setAuthStatus(true); // User is authenticated
+      })
+      .catch(error => {
+        setAuthStatus(false); // User is not authenticated
+        console.error('Authentication check failed', error);
+      });
+    }
+  }, [token]);
 
   const navItems = [
     {
@@ -41,8 +61,6 @@ function Header() {
     <header className='py-3 shadow bg-gray-500'>
       <Container>
         <nav className='flex'>
-          
-
           <ul className='flex ml-auto'>
             {navItems.map((item) => 
             item.active ? (

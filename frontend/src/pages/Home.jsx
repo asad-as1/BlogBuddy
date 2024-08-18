@@ -1,22 +1,40 @@
 import React, {useEffect, useState} from 'react'
-import appwriteService from "../appwrite/config";
 import {Container, PostCard} from '../components'
-import { useSelector } from 'react-redux';
 import {Button} from '../components/index'
 import { useNavigate } from 'react-router-dom';
+import Cookie from "cookies-js"
+import axios from "axios"
+
 function Home() {
+const navigate = useNavigate()
+  const [authStatus, setAuthStatus] = useState(false);
+  const token = Cookie.get('token')
+
+  useEffect(() => {
+    if (token) {
+      axios.get('/api/check-auth', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(response => {
+        setAuthStatus(true); // User is authenticated
+      })
+      .catch(error => {
+        setAuthStatus(false); // User is not authenticated
+        console.error('Authentication check failed', error);
+      });
+    }
+  }, [token]);
     const [posts, setPosts] = useState([])
-    const userStatus = useSelector((state) => state.auth.status);
-    const navigate = useNavigate();
-    useEffect(() => {
-        appwriteService.getPosts().then((posts) => {
-            if (posts) {
-                setPosts(posts.documents)
-            }
-        })
-    }, [])
+    
+    // useEffect(() => {
+    //     appwriteService.getPosts().then((posts) => {
+    //         if (posts) {
+    //             setPosts(posts.documents)
+    //         }
+    //     })
+    // }, [])
   
-    if(userStatus && posts.length == 0){
+    if(authStatus && posts.length == 0){
         return (
             <div className="w-full py-8 mt-4 text-center">
                 <Container>
@@ -32,7 +50,7 @@ function Home() {
             </div>
         )
     }
-    if (!userStatus) {
+    if (!authStatus) {
         return (
             <div className="w-full py-8 mt-4 text-center">
                 <Container>
@@ -54,6 +72,7 @@ function Home() {
                     {posts.map((post) => (
                         <div key={post.$id} className='p-2 w-1/4'>
                             <PostCard {...post} />
+                            Welcome home
                         </div>
                     ))}
                 </div>

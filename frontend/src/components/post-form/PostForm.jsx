@@ -1,7 +1,6 @@
 import React, { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
-import appwriteService from "../../appwrite/config";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -16,38 +15,9 @@ export default function PostForm({ post }) {
     });
 
     const navigate = useNavigate();
-    const userData = useSelector((state) => state.auth.userData);
 
     const submit = async (data) => {
-        console.log("input image :: ",data.image[0]);
-        if (post) {
-            const file = data.image[0] ? await appwriteService.uploadFile(data.image[0]) : null;
-            console.log("uploded file :: ", file);
-            if (file) {
-               await appwriteService.deleteFile(post.featuredImage);
-            }
-
-            const dbPost = await appwriteService.updatePost(post.$id, {
-                ...data,
-                featuredImage: file ? file.$id : undefined,
-            });
-              console.log("after post file :: ", dbPost);
-            if (dbPost) {
-                navigate(`/`);
-            }
-        } else {
-            const file = await appwriteService.uploadFile(data.image[0]);
-
-            if (file) {
-                const fileId = file.$id;
-                data.featuredImage = fileId;
-                const dbPost = await appwriteService.createPost({ ...data, userId: userData.$id });
-
-                if (dbPost) {
-                    navigate(`/`);
-                }
-            }
-        }
+      
     };
 
     const slugTransform = useCallback((value) => {
@@ -102,8 +72,8 @@ export default function PostForm({ post }) {
                 {post && (
                     <div className="w-full mb-4">
                         <img
-                            src={appwriteService.getFilePreview(post.featuredImage)}
-                            alt={post.title}
+                            src={""}
+                            alt={"title"}
                             className="rounded-lg"
                         />
                     </div>

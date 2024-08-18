@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const dotenv = require('dotenv')
+dotenv.config();
+
 const Schema = mongoose.Schema;
 
 // Define the User schema
@@ -50,6 +53,8 @@ const userSchema = new Schema({
     type: Date,
     default: Date.now
   }
+},{
+  timestamps: true
 });
 
 // Pre-save hook to hash the password before saving

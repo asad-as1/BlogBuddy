@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
 import axios from "axios"
-
+import Cookie from "cookies-js"
 function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
@@ -13,13 +13,19 @@ function Login() {
     setError("");
     try {
       const res = await axios.post(`http://localhost:5000/user/login`, data);
-      // console.log(res)
+      // console.log(res.data)
       if (res?.status === 200) {
         alert("Successfully LoggedIn");
+        const val = {
+          "httpOnly" : true,
+          "secure" : true
+        }
+        Cookie.set("token", res.data.token, val)
         navigate("/");
       }
     } catch (error) {
-      setError(error.message);
+      // console.log(error)
+      setError(error.response.data.message);
     }
   };
 

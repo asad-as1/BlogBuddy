@@ -3,7 +3,9 @@ const Post = require('../models/post')
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv')
 dotenv.config(); 
+// const cookie = require("cookie")
 
+const {authenticate} = require("../middlewares/auth")
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -41,15 +43,24 @@ exports.login = async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
       expiresIn: '7d'
     });
-
-    res.status(200).json({ message: 'Login successful', token, user });
+   
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        username: user.username,
+        role: user.role,
+        email: user.email, 
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 
 // Get user profile
 exports.getProfile = async (req, res) => {
