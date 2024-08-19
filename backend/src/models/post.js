@@ -11,16 +11,16 @@ const postSchema = new Schema({
     type: String,
     required: true
   },
+  media: {
+    type: String,
+    required: true
+  },
   author: {
     type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   categories: [{
-    type: String,
-    trim: true
-  }],
-  tags: [{
     type: String,
     trim: true
   }],
@@ -35,7 +35,6 @@ const postSchema = new Schema({
     },
     comment: {
       type: String,
-      required: true
     },
     createdAt: {
       type: Date,

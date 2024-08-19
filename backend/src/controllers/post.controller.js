@@ -4,19 +4,20 @@ const User = require('../models/user');
 // Create a new post
 exports.createPost = async (req, res) => {
   try {
-    const { title, content, author, categories, tags } = req.body;
+    const { title, content, categories } = req.body;
     const newPost = new Post({
       title,
       content,
-      author,
+      media: req.body?.media,
       categories,
-      tags
     });
 
     const savedPost = await newPost.save();
     res.status(201).json(savedPost);
   } catch (error) {
-    res.status(500).json({ message: 'Error creating post', error });
+    console.log(error);
+    
+    // res.status(500).json({ message: 'Error creating post', error });
   }
 };
 

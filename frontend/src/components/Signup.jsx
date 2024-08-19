@@ -13,6 +13,7 @@ function Signup() {
       setError("");
       try {
         const res = await axios.post(`http://localhost:5000/user/register`, data);
+        console.log(res)
         if (res?.status === 201) {
           alert("Successfully Registered");
           navigate("/");

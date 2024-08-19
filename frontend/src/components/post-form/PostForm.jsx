@@ -1,45 +1,59 @@
-import React, { useCallback } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import axios from "axios";
+import { upload } from "../../firebase";
 
 export default function PostForm({ post }) {
-    const { register, handleSubmit, watch, setValue, control, getValues } = useForm({
+    const { register, handleSubmit, setValue, control, getValues } = useForm({
         defaultValues: {
             title: post?.title || "",
-            slug: post?.$id || "",
+            categories: post?.categories || "",
             content: post?.content || "",
-            status: post?.status || "active",
+            status: post?.status || "Public",
         },
     });
 
+    const [mediaPreview, setMediaPreview] = useState(post?.media || "");
+    const [isVideo, setIsVideo] = useState(false);
     const navigate = useNavigate();
 
     const submit = async (data) => {
-      
+        // console.log(data)
+        try {
+            if (data.media) {
+                const url = await upload(data.media);
+                data.media = url;
+            }
+
+            const res = await axios.post("http://localhost:5000/post/newPost", data);
+            // console.log("Post Uploaded sucessfully")
+            navigate("/"); // Adjust this route as needed
+        } catch (error) {
+            console.error("Error submitting post:", error);
+        }
     };
 
-    const slugTransform = useCallback((value) => {
-        if (value && typeof value === "string")
-            return value
-                .trim()
-                .toLowerCase()
-                .replace(/[^a-zA-Z\d\s]+/g, "-")
-                .replace(/\s/g, "-");
+    const handleMediaChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const fileType = file.type.split("/")[0];
+            setIsVideo(fileType === "video");
 
-        return "";
-    }, []);
-
-    React.useEffect(() => {
-        const subscription = watch((value, { name }) => {
-            if (name === "title") {
-                setValue("slug", slugTransform(value.title), { shouldValidate: true });
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, [watch, slugTransform, setValue]);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setMediaPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+            
+            // Manually set the file in react-hook-form
+            setValue("media", file);
+        } else {
+            setMediaPreview("");
+            setIsVideo(false);
+        }
+    };
 
     return (
         <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
@@ -51,35 +65,39 @@ export default function PostForm({ post }) {
                     {...register("title", { required: true })}
                 />
                 <Input
-                    label="Slug :"
-                    placeholder="Slug"
+                    label="Categories :"
+                    placeholder="Categories"
                     className="mb-4"
-                    {...register("slug", { required: true })}
-                    onInput={(e) => {
-                        setValue("slug", slugTransform(e.currentTarget.value), { shouldValidate: true });
-                    }}
+                    {...register("categories", { required: true })}
                 />
                 <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
             </div>
             <div className="w-1/3 px-2">
-                <Input
-                    label="Featured Image :"
+                <input
+                    label="Featured Media :"
                     type="file"
                     className="mb-4"
-                    accept="image/png, image/jpg, image/jpeg, image/gif"
-                    {...register("image", { required: !post })}
+                    accept="image/*,video/*"
+                    onChange={handleMediaChange}
                 />
-                {post && (
+                {mediaPreview && (
                     <div className="w-full mb-4">
-                        <img
-                            src={""}
-                            alt={"title"}
-                            className="rounded-lg"
-                        />
+                        {isVideo ? (
+                            <video controls className="rounded-lg">
+                                <source src={mediaPreview} type="video/mp4" />
+                                Your browser does not support the video tag.
+                            </video>
+                        ) : (
+                            <img
+                                src={mediaPreview}
+                                alt="Featured"
+                                className="rounded-lg"
+                            />
+                        )}
                     </div>
                 )}
                 <Select
-                    options={["active", "inactive"]}
+                    options={["Public", "Private"]}
                     label="Status"
                     className="mb-4"
                     {...register("status", { required: true })}

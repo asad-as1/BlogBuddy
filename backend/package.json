@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@firebase/analytics": "^0.10.7",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "connect-mongo": "^5.1.0",
@@ -10,9 +11,11 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
+    "firebase": "^10.13.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
-    "mongoose": "^8.5.3"
+    "mongoose": "^8.5.3",
+    "uuid": "^10.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -22,7 +25,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "keywords": [],
-  "author": "",
+  "author": "Mohd Asad Ansari",
   "license": "ISC",
   "description": ""
 }
