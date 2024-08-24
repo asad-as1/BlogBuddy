@@ -28,6 +28,7 @@ export default function PostForm({ post }) {
             }
 
             const res = await axios.post("http://localhost:5000/post/newPost", data);
+            
             // console.log("Post Uploaded sucessfully")
             navigate("/"); // Adjust this route as needed
         } catch (error) {

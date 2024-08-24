@@ -1,24 +1,26 @@
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
+const jwt = require('jsonwebtoken');
+const User = require('../models/user'); // Adjust the path to your User model
 
-// Middleware for JWT authentication
-exports.authenticate = (req, res, next) => {
-  const authHeader = req.header('Authorization');
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token, authorization denied' });
+const authenticate = async (req, res, next) => {
+  const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
   }
-  
-  const token = authHeader.replace('Bearer ', '');
 
   try {
     const decoded = jwt.verify(token, process.env.SECRET);
-    req.userId = decoded.userId; 
-    console.log("Authentication successful");
-    next(); 
+    req.user = await User.findById(decoded.userId); // Attach user to request
+    if (!req.user) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+    next();
   } catch (error) {
-    console.error('Token verification failed:', error);
-    res.status(401).json({ message: 'Invalid token' });
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
+
+module.exports = { authenticate };
+

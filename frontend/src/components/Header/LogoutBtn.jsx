@@ -1,18 +1,30 @@
-import React from 'react'
-import {useNavigate} from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import Cookie from 'cookies-js';
 
+function LogoutBtn({ setAuthStatus }) {
+  const navigate = useNavigate();
 
-function LogoutBtn() {
-    const navigate = useNavigate()
-    const logoutHandler = () => {
-       
+  const logoutHandler = async () => {
+    try {
+      await axios.post(`http://localhost:5000/user/logout`);
+      Cookie.expire('token'); // Remove the token cookie
+      setAuthStatus(false); // Update auth status in Header
+      navigate('/login'); // Redirect to login page
+    } catch (error) {
+      console.error('Logout failed', error);
     }
+  };
+
   return (
     <button
-    className='inline-bock px-6 py-2 duration-200 hover:bg-blue-100 rounded-full'
-    onClick={logoutHandler}
-    >Logout</button>
-  )
+      className='inline-block px-6 py-2 duration-200 hover:bg-blue-100 rounded-full'
+      onClick={logoutHandler}
+    >
+      Logout
+    </button>
+  );
 }
-         
-export default LogoutBtn
+
+export default LogoutBtn;

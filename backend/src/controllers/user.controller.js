@@ -61,6 +61,19 @@ exports.login = async (req, res) => {
   }
 };
 
+// Logout the user
+exports.logout = (req, res) => {
+  try {
+    // Clear the token from the client-side (assuming it's stored in cookies)
+    res.clearCookie('token'); // or res.cookie('token', '', { expires: new Date(0) });
+
+    res.status(200).json({ message: 'Logout successful' });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
 
 // Get user profile
 exports.getProfile = async (req, res) => {

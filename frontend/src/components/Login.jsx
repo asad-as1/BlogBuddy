@@ -1,46 +1,49 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
-import axios from "axios"
-import Cookie from "cookies-js"
+import axios from "axios";
+import Cookie from "cookies-js";
+
 function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    const token = Cookie.get("token");
+    if (token) {
+      // Redirect to the home page if a token is present
+      navigate("/");
+    }
+  }, [navigate]);
+
   const login = async (data) => {
     setError("");
     try {
       const res = await axios.post(`http://localhost:5000/user/login`, data);
-      // console.log(res.data)
       if (res?.status === 200) {
-        alert("Successfully LoggedIn");
+        // alert("Successfully Logged In");
         const val = {
-          "httpOnly" : true,
-          "secure" : true
-        }
-        Cookie.set("token", res.data.token, val)
+          "httpOnly": true,
+          "secure": true
+        };
+        Cookie.set("token", res.data.token, val);
         navigate("/");
       }
     } catch (error) {
-      // console.log(error)
-      setError(error.response.data.message);
+      setError(error.response.data.message || "Login failed. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center w-full">
-      <div
-        className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}
-      >
-        <div className="mb-2 flex justify-center">
-        </div>
+    <div className="flex items-center justify-center w-full mt-20 mb-20">
+      <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
         <h2 className="text-center text-2xl font-bold leading-tight">
           Sign in to your account
         </h2>
         <p className="mt-2 text-center text-base text-black/60">
-          Don&apos;t have any account?&nbsp;
+          Don&apos;t have an account?&nbsp;
           <Link
             to="/signup"
             className="font-medium text-primary transition-all duration-200 hover:underline"
