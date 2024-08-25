@@ -1,14 +1,20 @@
 const Post = require('../models/post');
-const User = require('../models/user'); 
+const User = require('../models/user');
 
 // Create a new post
 exports.createPost = async (req, res) => {
   try {
-    const { title, content, categories } = req.body;
+    const { title, content, categories, media } = req.body;
+    const user = req.user;
+
     const newPost = new Post({
+      author: user._id,
       title,
       content,
-      media: req.body?.media,
+      media: {
+        url: media.url,
+        isVideo: media.isVideo || false,
+      },
       categories,
     });
 
@@ -16,15 +22,14 @@ exports.createPost = async (req, res) => {
     res.status(201).json(savedPost);
   } catch (error) {
     console.log(error);
-    
-    // res.status(500).json({ message: 'Error creating post', error });
+    res.status(500).json({ message: 'Error creating post', error });
   }
 };
 
 // Get all posts
 exports.getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().populate('author', 'username name email');
+    const posts = await Post.find();
     res.status(200).json(posts);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching posts', error });
@@ -51,11 +56,21 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const { title, content, categories, tags, isPublished } = req.body;
+    const { title, content, categories, media, isPublished } = req.body;
 
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
-      { title, content, categories, tags, isPublished, updatedAt: Date.now() },
+      {
+        title,
+        content,
+        media: {
+          url: media.url,
+          isVideo: media.isVideo || false,
+        },
+        categories,
+        isPublished,
+        updatedAt: Date.now(),
+      },
       { new: true }
     );
 
@@ -89,7 +104,7 @@ exports.deletePost = async (req, res) => {
 exports.likePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user._id; // Assuming the user ID is available in req.user
+    const userId = req.user._id;
 
     const post = await Post.findById(postId);
 
@@ -97,7 +112,6 @@ exports.likePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if the user has already liked the post
     if (post.likes.includes(userId)) {
       return res.status(400).json({ message: 'You already liked this post' });
     }
@@ -115,7 +129,7 @@ exports.likePost = async (req, res) => {
 exports.unlikePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user._id; // Assuming the user ID is available in req.user
+    const userId = req.user._id;
 
     const post = await Post.findById(postId);
 
@@ -123,7 +137,6 @@ exports.unlikePost = async (req, res) => {
       return res.status(404).json({ message: 'Post not found' });
     }
 
-    // Check if the user has liked the post
     if (!post.likes.includes(userId)) {
       return res.status(400).json({ message: 'You have not liked this post' });
     }
@@ -142,7 +155,7 @@ exports.addComment = async (req, res) => {
   try {
     const postId = req.params.postId;
     const { comment } = req.body;
-    const userId = req.user._id; // Assuming the user ID is available in req.user
+    const userId = req.user._id;
 
     const post = await Post.findById(postId);
 
@@ -168,7 +181,7 @@ exports.deleteComment = async (req, res) => {
   try {
     const postId = req.params.postId;
     const commentId = req.params.commentId;
-    const userId = req.user._id; // Assuming the user ID is available in req.user
+    const userId = req.user._id;
 
     const post = await Post.findById(postId);
 
@@ -182,7 +195,6 @@ exports.deleteComment = async (req, res) => {
       return res.status(404).json({ message: 'Comment not found' });
     }
 
-    // Check if the comment belongs to the user or if the user is an admin
     if (comment.user.toString() !== userId.toString() && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'You are not authorized to delete this comment' });
     }

@@ -12,8 +12,14 @@ const postSchema = new Schema({
     required: true
   },
   media: {
-    type: String,
-    required: true
+    url: {
+      type: String,
+      required: true
+    },
+    isVideo: {
+      type: Boolean, // Corrected from `boolean` to `Boolean`
+      default: false
+    }
   },
   author: {
     type: Schema.Types.ObjectId,

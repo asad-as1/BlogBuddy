@@ -12,7 +12,7 @@ const navigate = useNavigate()
 
   useEffect(() => {
     if (token) {
-      axios.get('/api/check-auth', {
+      axios.get('/user/check-auth', {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(response => {
@@ -26,13 +26,19 @@ const navigate = useNavigate()
   }, [token]);
     const [posts, setPosts] = useState([])
     
-    // useEffect(() => {
-    //     appwriteService.getPosts().then((posts) => {
-    //         if (posts) {
-    //             setPosts(posts.documents)
-    //         }
-    //     })
-    // }, [])
+    useEffect(() => {
+        const fetchData = async () => {
+          try {
+            const res = await axios.get('http://localhost:5000/post/allPosts');
+            // console.log(res.data);
+            setPosts(res.data)
+          } catch (error) {
+            console.error('Request failed', error);
+          }
+        };
+    
+        fetchData(); // Call the async function inside useEffect
+      }, []); // The empty array ensures this runs only once on mount
   
     if(authStatus && posts.length == 0){
         return (
@@ -41,7 +47,6 @@ const navigate = useNavigate()
                     <div className="flex flex-wrap">
                         <div className="p-2 w-full">
                             <h1 className="text-2xl font-bold hover:text-gray-500">
-                                {/* Login to read posts */}
                                 <Button children={"AddPost"} onClick= {()=>{navigate( "/add-post")}}/>
                             </h1>
                         </div>
@@ -70,9 +75,8 @@ const navigate = useNavigate()
             <Container>
                 <div className='flex flex-wrap'>
                     {posts.map((post) => (
-                        <div key={post.$id} className='p-2 w-1/4'>
+                        <div key={post._id} className='p-2 w-1/4'>
                             <PostCard {...post} />
-                            Welcome home
                         </div>
                     ))}
                 </div>

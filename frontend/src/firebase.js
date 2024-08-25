@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
-export const upload = async (media) => {
+export const upload = async (media, onProgress) => {
   try {
     const imgRef = ref(storage, `files/${uuidv4()}`);
     const uploadTask = uploadBytesResumable(imgRef, media);
@@ -23,7 +23,13 @@ export const upload = async (media) => {
     return new Promise((resolve, reject) => {
       uploadTask.on(
         "state_changed",
-        null, // progress function (optional)
+        (snapshot) => {
+          // Calculate the progress percentage
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          if (onProgress) {
+            onProgress(progress.toFixed(2)); // Pass the progress to the callback
+          }
+        },
         (error) => reject(error),
         async () => {
           try {

@@ -3,9 +3,7 @@ const Post = require('../models/post')
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv')
 dotenv.config(); 
-// const cookie = require("cookie")
 
-const {authenticate} = require("../middlewares/auth")
 
 // Register a new user
 exports.register = async (req, res) => {
@@ -78,7 +76,8 @@ exports.logout = (req, res) => {
 // Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select('-password'); // Exclude the password field
+    // console.log(req.user)
+    const user = await User.findById(req.user._id).select('-password'); // Exclude the password field
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -88,6 +87,25 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+
+// Get user by ID
+exports.getUserById = async (req, res) => {
+  try {
+    const userId  = req.body?.author;
+    // console.log(userId)
+    const user = await User.findById(userId).select('-password'); 
+    if (!user) {
+      return res.status(404).json({ message: 'User not found!!' });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
+
 
 // Update user profile
 exports.updateProfile = async (req, res) => {
