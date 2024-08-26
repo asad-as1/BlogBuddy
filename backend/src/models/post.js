@@ -55,8 +55,8 @@ const postSchema = new Schema({
     type: Date
   },
   isPublished: {
-    type: Boolean,
-    default: true
+    type: String,
+    default: "Public"
   }
 });
 

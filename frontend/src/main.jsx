@@ -8,8 +8,8 @@ import { Login } from "./components/index.js";
 import AddPost from "./pages/AddPost";
 import Signup from "./pages/Signup";
 import EditPost from "./pages/EditPost";
-import Post from "./pages/Post";
-import AllPosts from "./pages/AllPosts";
+import SinglePost from "./pages/SinglePost.jsx"
+import Profile from "./pages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
@@ -30,9 +30,9 @@ const router = createBrowserRouter([
         element: <Signup />,
       },
       {
-        path: "/all-posts",
+        path: "/profile",
         element: (
-          <ProtectedRoute element={<AllPosts />} />
+          <ProtectedRoute element={<Profile />} />
         ),
       },
       {
@@ -42,14 +42,16 @@ const router = createBrowserRouter([
         ),
       },
       {
+        path: "/post/:id",
+        element: (
+          <ProtectedRoute element={<SinglePost />} />
+        ),
+      },
+      {
         path: "/edit-post/:slug",
         element: (
           <ProtectedRoute element={<EditPost />} />
         ),
-      },
-      {
-        path: "/post/:slug",
-        element: <Post />,
       },
     ],
   },

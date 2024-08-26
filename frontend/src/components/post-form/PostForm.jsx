@@ -4,6 +4,7 @@ import { Button, Input, RTE, Select } from "..";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { upload } from "../../firebase";
+import { htmlToText } from 'html-to-text';  // Import html-to-text
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, setValue, control, getValues } = useForm({
@@ -11,7 +12,7 @@ export default function PostForm({ post }) {
       title: post?.title || "",
       categories: post?.categories || "",
       content: post?.content || "",
-      status: post?.status || "Public",
+      isPublished: post?.isPublished || "Public",
     },
   });
 
@@ -23,6 +24,9 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     try {
+      // Convert HTML content to plain text
+      data.content = htmlToText(data.content);
+
       if (data.media) {
         const startTime = Date.now();
         const url = await upload(data.media, (progress) => {
@@ -120,7 +124,7 @@ export default function PostForm({ post }) {
           options={["Public", "Private"]}
           label="Status"
           className="mb-4"
-          {...register("status", { required: true })}
+          {...register("isPublished", { required: true })}
         />
         <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
           {post ? "Update" : "Submit"}

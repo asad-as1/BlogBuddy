@@ -28,21 +28,21 @@ function Header() {
     { name: 'Home', slug: "/", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
-    { name: "All Posts", slug: "/all-posts", active: authStatus },
+    { name: "Profile", slug: "/profile", active: authStatus },
     { name: "Add Post", slug: "/add-post", active: authStatus },
   ];
 
   return (
-    <header className='py-3 shadow bg-gray-500'>
+    <header className='py-3 shadow bg-blue-950 text-white'>
       <Container>
-        <nav className='flex'>
-          <ul className='flex ml-auto'>
+        <nav className='flex items-center justify-around'>
+          <ul className='flex'>
             {navItems.map((item) => 
               item.active && (
                 <li key={item.name}>
                   <button
                     onClick={() => navigate(item.slug)}
-                    className='inline-block px-6 py-2 duration-200 hover:bg-blue-100 rounded-full'
+                    className='inline-block px-6 py-2 duration-200 hover:bg-blue-900 rounded-full'
                   >
                     {item.name}
                   </button>

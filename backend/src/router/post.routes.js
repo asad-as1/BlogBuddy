@@ -11,7 +11,10 @@ router.put('/:postId', authenticate, postController.updatePost);
 router.delete('/:postId', authenticate, postController.deletePost);
 router.post('/:postId/like', authenticate, postController.likePost);
 router.post('/:postId/unlike', authenticate, postController.unlikePost);
-router.post('/:postId/comments', authenticate, postController.addComment);
-router.delete('/:postId/comments/:commentId', authenticate, postController.deleteComment);
+router.post('/:postId/comment', authenticate, postController.addComment);
+router.delete('/:postId/comment/:commentId', authenticate, postController.deleteComment);
+
+router.get('/:postId/likes', postController.fetchLikesList);
+router.get('/:postId/comments', postController.fetchCommentsList);
 
 module.exports = router;
