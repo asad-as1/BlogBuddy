@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 
 function Footer() {
   return (
-    <section className="relative overflow-hidden py-10 text-white bg-blue-950 hover:text-gray-300 border-t-2 border-t-black">
-      <div className="relative z-10 mx-auto max-w-7xl px-4">
+    <footer className="mt-6 py-10 text-white bg-blue-950 hover:text-gray-300 border-t-2 border-t-black">
+      <div className="mx-auto max-w-7xl px-4">
         <div className="-m-6 flex flex-wrap flex-col md:flex-row">
           <div className="w-full p-6 md:w-5/12">
             <div className="flex h-full flex-col justify-between">
@@ -132,7 +132,7 @@ function Footer() {
           </div>
         </div>
       </div>
-    </section>
+    </footer>
   )
 }
 

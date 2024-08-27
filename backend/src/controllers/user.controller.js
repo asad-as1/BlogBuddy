@@ -147,3 +147,61 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
+exports.addPostToFavorites = async (req, res) => {
+  try {
+    const userId = req.user.id; // assuming you have user ID from the request (e.g., via JWT)
+    const postId = req.params.postId; // post ID from the request params
+    
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    // Check if the post exists
+    post = await Post.findById(postId);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    
+    // Check if the post is already in the user's favorites
+    if (user.favourites.includes(postId)) {
+      return res.status(400).json({ message: 'Post is already in favorites' });
+    }
+
+    // Add the post to the user's favorites
+    user.favourites.push(postId);
+    await user.save();
+
+    return res.status(200).json({ message: 'Post added to favorites', favorites: user.favorites });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.isPostInFavourites = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const postId = req.params.postId; // post ID from the request params
+
+    // Find the user by ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the post ID is in the user's favorites
+    const isFavourite = user.favourites.includes(postId);
+
+    if (isFavourite) {
+      return res.status(200).json({ message: 'Post is in favourites', isFavourite: true });
+    } else {
+      return res.status(200).json({ message: 'Post is not in favourites', isFavourite: false });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
