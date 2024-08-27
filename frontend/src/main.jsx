@@ -11,6 +11,7 @@ import EditPost from "./pages/EditPost";
 import SinglePost from "./pages/SinglePost.jsx"
 import Profile from "./pages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Favourites from "./pages/Favourites.jsx";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +40,12 @@ const router = createBrowserRouter([
         path: "/add-post",
         element: (
           <ProtectedRoute element={<AddPost />} />
+        ),
+      },
+      {
+        path: "/user/favourites",
+        element: (
+          <ProtectedRoute element={<Favourites />} />
         ),
       },
       {

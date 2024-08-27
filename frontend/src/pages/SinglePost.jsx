@@ -124,6 +124,21 @@ export default function SinglePost() {
     }
   };
 
+  const RemoveFromFavorites = async (e) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/user/removeFavourites/${post?._id}`,
+        { withCredentials: true }
+      );
+      if (res.status == 200) {
+        setAddedFav(false);
+      }
+      alert("Post Removed Successfully From Your Favourites");
+    } catch (error) {
+      console.error("Failed to remove from Favourites:", error);
+    }
+  };
+
   const checkIfPostIsFavorite = async () => {
     try {
       const res = await axios.get(
@@ -213,13 +228,22 @@ export default function SinglePost() {
 
         {/* Bottom Buttons */}
         <div className="flex justify-center mt-4 mb-6">
-          {addedFav !== true && (
+          {addedFav !== true ? (
             <Button
               bgColor="bg-blue-500"
               className="mr-3"
               onClick={() => addPostToFavorites(post?._id)} 
             >
               Add To Favourites
+            </Button>
+          ) :
+           (
+            <Button
+              bgColor="bg-blue-500"
+              className="mr-3"
+              onClick={() => RemoveFromFavorites(post?._id)} 
+            >
+              Remove From Favourites
             </Button>
           )}
           {(isAuthor || isAdmin) && ( // Show delete button if the user is the author or an admin
@@ -309,7 +333,7 @@ export default function SinglePost() {
                         <FaUser className="w-6 h-6 text-gray-500" />
                       )}
                       <span className="font-semibold">
-                        @{comment.user.username}
+                        <Link to={`/profile/${comment.user._id}`}>@{comment.user.username}</Link>
                       </span>
                     </div>
                     <p className="text-gray-700 break-words bg-gray-300 p-2 rounded-lg mb-2">

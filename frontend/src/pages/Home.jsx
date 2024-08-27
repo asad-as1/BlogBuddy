@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Container, PostCard } from '../components';
-import { Button } from '../components/index';
 import { useNavigate } from 'react-router-dom';
-import Cookie from "cookies-js";
 import axios from "axios";
+import { Button } from '../components/index';
+import Cookie from "cookies-js";
 
 function Home() {
   const navigate = useNavigate();

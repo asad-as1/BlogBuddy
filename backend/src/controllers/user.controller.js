@@ -159,23 +159,52 @@ exports.addPostToFavorites = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
     
-    // Check if the post exists
-    post = await Post.findById(postId);
+    const post = await Post.findById(postId);
     
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
     
-    // Check if the post is already in the user's favorites
     if (user.favourites.includes(postId)) {
       return res.status(400).json({ message: 'Post is already in favorites' });
     }
 
-    // Add the post to the user's favorites
     user.favourites.push(postId);
     await user.save();
 
-    return res.status(200).json({ message: 'Post added to favorites', favorites: user.favorites });
+    return res.status(200).json({ message: 'Post added to favorites', favourites: user.favourites });
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+
+exports.RemoveFromFavorites = async (req, res) => {
+  try {
+    const userId = req.user.id; 
+    const postId = req.params.postId; 
+    
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    const post = await Post.findById(postId);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+    
+    if (!user.favourites.includes(postId)) {
+      return res.status(400).json({ message: 'Post is not in favorites' });
+    }
+
+    // remove the post from the user's favorites
+    user.favourites.pull(postId);
+    await user.save();
+
+    return res.status(200).json({ message: 'Post removed from favorites', favorites: user.favourites });
   } catch (error) {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
@@ -205,3 +234,21 @@ exports.isPostInFavourites = async (req, res) => {
     return res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
+// Fetch the list of on a user
+exports.fetchFavourites = async (req, res) => {
+  const userId = req.user._id; 
+  
+  try {
+    const user = await User.findById(userId).populate('favourites');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ favourites: user.favourites });  
+  } catch (error) {
+    console.error('Error fetching favourites:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+

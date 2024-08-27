@@ -12,6 +12,8 @@ router.post('/getUserById', authenticate, userController.getUserById);
 router.put('/profile', authenticate, userController.updateProfile);
 // router.delete('/delete', userController.deleteUser);// while testing authenticate is not required
 router.delete('/delete', authenticate, userController.deleteUser);
+router.get('/favourites', authenticate, userController.fetchFavourites);
+router.get('/removeFavourites/:postId', authenticate, userController.RemoveFromFavorites);
 router.get('/favourites/:postId', authenticate, userController.addPostToFavorites);
 router.get('/favourites/check/:postId', authenticate, userController.isPostInFavourites);
 
