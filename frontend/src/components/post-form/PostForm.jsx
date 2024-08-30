@@ -4,7 +4,7 @@ import { Button, Input, RTE, Select } from "..";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { upload } from "../../firebase";
-import { htmlToText } from 'html-to-text';  // Import html-to-text
+import { htmlToText } from 'html-to-text';  
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, setValue, control, getValues } = useForm({
@@ -24,54 +24,69 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     try {
-      // Convert HTML content to plain text
       data.content = htmlToText(data.content);
 
       if (data.media) {
+        // New media file is provided
         const startTime = Date.now();
         const url = await upload(data.media, (progress) => {
           setUploadProgress(progress);
         });
         const endTime = Date.now();
         const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // in seconds
-
+  
         data.media = {
           url: url,
           isVideo: isVideo,
         };
         setUploadTime(timeTaken);
+      } else if (post) {
+        // No new media file, preserve existing media
+        data.media = post.media;
       }
-
-      await axios.post("http://localhost:5000/post/newPost", data, {
-        withCredentials: true,
-      });
-
+  
+      if (post) {
+        // Update existing post
+        await axios.put(`http://localhost:5000/post/${post._id}`, data, {
+          withCredentials: true,
+        });
+      } else {
+        // Create new post
+        await axios.post("http://localhost:5000/post/newPost", data, {
+          withCredentials: true,
+        });
+      }
+  
       navigate("/");
     } catch (error) {
       console.error("Error submitting post:", error);
     }
   };
+  
 
-  const handleMediaChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const fileType = file.type.split("/")[0];
-      setIsVideo(fileType === "video");
+ const handleMediaChange = (e) => {
+  const file = e.target.files[0];
+  // console.log(file)
+  
+  if (file) {
+    const fileType = file.type.split("/")[0];
+    setIsVideo(fileType === "video");
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setMediaPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setMediaPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
 
-      setValue("media", file);
-      setUploadProgress(0);
-      setUploadTime(null);
-    } else {
-      setMediaPreview("");
-      setIsVideo(false);
-    }
-  };
+    setValue("media", file); // Set the new media file
+    setUploadProgress(0);
+    setUploadTime(null);
+  } else {
+    setMediaPreview("");
+    setIsVideo(false);
+    setValue("media", null); // Clear the media file
+  }
+};
 
   return (
     <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">

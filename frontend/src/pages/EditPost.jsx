@@ -1,23 +1,27 @@
 import React, {useEffect, useState} from 'react'
 import {Container, PostForm} from '../components'
-import { useNavigate,  useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
+import axios from 'axios';
 
 function EditPost() {
-    const [post, setPosts] = useState(null)
-    const {slug} = useParams()
-    const navigate = useNavigate()
+    const location = useLocation();
+    const pathname = location.pathname;
+    const postId = pathname.split('/')[2];
+
+    const [post, setPost] = useState(null)
 
     useEffect(() => {
-        if (slug) {
-            // appwriteService.getPost(slug).then((post) => {
-                if (post) {
-                    setPosts(post)
-                }
-            // })
-        } else {
-            navigate('/')
-        }
-    }, [slug, navigate])
+        const fetchPostData = async () => {
+            try {
+              const res = await axios.get(`http://localhost:5000/post/${postId}`);
+              setPost(res?.data);
+            } catch (error) {
+              console.error("Request failed", error);
+            }
+        };
+        fetchPostData()
+    }, [])
+
   return post ? (
     <div className='py-8'>
         <Container>

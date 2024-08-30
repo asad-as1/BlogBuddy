@@ -71,6 +71,7 @@ export default function SinglePost() {
   const fetchLikesList = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/post/${id}/likes`);
+      // console.log(first)
       setLikesList(res?.data?.likes);
     } catch (error) {
       console.error("Failed to fetch likes list:", error);
@@ -145,13 +146,13 @@ export default function SinglePost() {
         `http://localhost:5000/user/favourites/check/${id}`,
         { withCredentials: true }
       );
+      // console.log(res)
       if (res?.data?.isFavourite) setAddedFav(res?.data?.isFavourite);
     } catch (error) {
       console.error("Failed to check Favourites:", error);
     }
   };
-  checkIfPostIsFavorite();
-
+  
   const deletePost = async () => {
     try {
       await axios.delete(`http://localhost:5000/post/${id}`, {
@@ -162,7 +163,7 @@ export default function SinglePost() {
       console.error("Failed to delete post:", error);
     }
   };
-
+  
   const handleDeleteComment = async (commentId) => {
     try {
       const res = await axios.delete(
@@ -176,11 +177,12 @@ export default function SinglePost() {
       console.error("Failed to delete comment:", error);
     }
   };
-
+  
   const isAuthor = loggedInUserId === post?.author?._id;
   const isAdmin = loggedInUserRole === "admin"; // Check if user is admin
-
+  
   useEffect(() => {
+    checkIfPostIsFavorite();
     fetchLikesList();
     fetchCommentsList();
   }, [id]);

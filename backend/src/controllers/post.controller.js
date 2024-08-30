@@ -57,8 +57,8 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const { title, content, categories, media, isPublished } = req.body;
-
+    const { title, categories, content, media, isPublished } = req.body;
+    
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       {
@@ -224,8 +224,6 @@ exports.deleteComment = async (req, res) => {
     res.status(500).json({ message: 'Error deleting comment', error });
   }
 };
-
-
 
 
 // Fetch the list of users who liked a post
