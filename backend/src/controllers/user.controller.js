@@ -77,7 +77,7 @@ exports.logout = (req, res) => {
 exports.getProfile = async (req, res) => {
   try {
     // console.log(req.user)
-    const user = await User.findById(req.user._id).select('-password'); // Exclude the password field
+    const user = await User.findById(req.user._id).select('-password').populate('posts'); // Exclude the password field
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }

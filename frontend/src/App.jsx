@@ -6,7 +6,7 @@ import { Outlet } from "react-router-dom";
 function App() {
   return(
   <div
-    className="min-h-screen flex flex-wrap content-between bg-white">
+    className="min-h-screen flex flex-wrap content-between bg-gradient-to-r from-blue-100 to-purple-300">
     <div className="w-full block">
       <Header />
       <main>

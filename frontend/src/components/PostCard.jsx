@@ -65,7 +65,7 @@ function PostCard({
   };
 
   // Conditionally render the PostCard only if the post is published as "Public"
-  if (isPublished !== "Public") return null;
+  // if (isPublished !== "Public") return null;
 
   return (
     <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">

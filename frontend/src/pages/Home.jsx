@@ -77,7 +77,7 @@ function Home() {
       <Container>
         <div className='flex flex-wrap mt-4 justify-around'>
           {posts.map((post) => (
-            post.isPublished === "Public" && ( // Only render if post is public
+            (post.isPublished === "Public") && ( // Only render if post is public
               <div key={post._id} className='p-2 w-1/3'>
                 <PostCard {...post} />
               </div>
