@@ -1,9 +1,31 @@
-import React from 'react'
+import React, {useState, useEffect} from "react";
+import { Signup as SignupComponent } from '../components'
+import axios from "axios"
 
 const EditProfile = () => {
-  return (
-    <div>EditProfile</div>
-  )
-}
+  const [user, setUser] = useState([]);
 
-export default EditProfile
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/user/profile", {
+          withCredentials: true,
+        });
+        setUser(res?.data?.user);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+    fetchUserData();
+  }, []);
+
+
+  return (
+    <div className="py-8">
+      <SignupComponent user={user} />
+    </div>
+  );
+};
+
+export default EditProfile;

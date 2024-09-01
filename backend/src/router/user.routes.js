@@ -8,9 +8,9 @@ router.post('/register', userController.register);
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.get('/profile', authenticate, userController.getProfile);
-router.post('/getUserById', authenticate, userController.getUserById);
+router.get('/profile/:username', authenticate, userController.getUsername);
+router.post('/getUserById', userController.getUserById);
 router.put('/profile', authenticate, userController.updateProfile);
-// router.delete('/delete', userController.deleteUser);// while testing authenticate is not required
 router.delete('/delete', authenticate, userController.deleteUser);
 router.get('/favourites', authenticate, userController.fetchFavourites);
 router.get('/removeFavourites/:postId', authenticate, userController.RemoveFromFavorites);

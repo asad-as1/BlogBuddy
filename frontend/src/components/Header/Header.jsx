@@ -7,28 +7,64 @@ import axios from 'axios';
 function Header() {
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState(false);
+  const [user, setUser] = useState(null);
   const token = Cookie.get('token');
 
   useEffect(() => {
-    if (token) {
-      axios.get('/user/check-auth', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      .then(response => {
-        setAuthStatus(true); // User is authenticated
-      })
-      .catch(error => {
-        setAuthStatus(false); // User is not authenticated
-        console.error('Authentication check failed', error);
-      });
-    }
+    const checkAuth = async () => {
+      if (token) {
+        try {
+          await axios.get('/user/check-auth', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setAuthStatus(true); // User is authenticated
+        } catch (error) {
+          setAuthStatus(false); // User is not authenticated
+          console.error('Authentication check failed', error);
+        }
+      } else {
+        setAuthStatus(false);
+      }
+    };
+
+    checkAuth();
   }, [token]);
+
+  useEffect(() => {
+    if (authStatus) {
+      const fetchUserData = async () => {
+        try {
+          const res = await axios.get('http://localhost:5000/user/profile', {
+            withCredentials: true,
+          });
+          setUser(res.data.user);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      };
+      fetchUserData();
+    } else {
+      setUser(null);
+    }
+  }, [authStatus]);
+
+  const handleLogout = async () => {
+    try {
+      await axios.post('http://localhost:5000/user/logout', { withCredentials: true });
+      Cookie.expire('token');
+      setAuthStatus(false);
+      setUser(null);
+      navigate('/login'); // Redirect to login page
+    } catch (error) {
+      console.error('Failed to log out:', error);
+    }
+  };
 
   const navItems = [
     { name: 'Home', slug: "/", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
-    { name: "Profile", slug: "/profile", active: authStatus },
+    { name: "Profile", slug: `/profile/${user?.username}`, active: authStatus },
     { name: "Add Post", slug: "/add-post", active: authStatus },
     { name: "Favourites", slug: "/user/favourites", active: authStatus },
   ];
@@ -52,7 +88,12 @@ function Header() {
             )}
             {authStatus && (
               <li>
-                <LogoutBtn setAuthStatus={setAuthStatus} />
+                <button
+                  onClick={handleLogout}
+                  className='inline-block px-6 py-2 duration-200 hover:bg-red-700 rounded-full'
+                >
+                  Logout
+                </button>
               </li>
             )}
           </ul>

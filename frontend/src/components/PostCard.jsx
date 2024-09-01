@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaHeart, FaComment } from "react-icons/fa";
 import axios from "axios";
+import Cookie from "cookies-js";
 
 function PostCard({
   _id,
@@ -20,29 +21,32 @@ function PostCard({
   const mediaUrl = typeof media === "string" ? media : media?.url;
 
   const navigate = useNavigate();
+  const token = Cookie.get("token");
 
   useEffect(() => {
     // Fetch the current user's profile
-    const fetchUserProfile = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/user/profile", {
-          withCredentials: true,
-        });
-        const currentUserId = res.data.user._id;
-        setUserId(currentUserId);
-        setIsLiked(likes.includes(currentUserId));
-        const authordata = await axios.post(
-          "http://localhost:5000/user/getUserById",
-          { author },
-          { withCredentials: true }
-        );
-        setAuthorData(authordata?.data?.user);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
+    if (token) {
+      const fetchUserProfile = async () => {
+        try {
+          const res = await axios.get("http://localhost:5000/user/profile", {
+            withCredentials: true,
+          });
+          const currentUserId = res.data.user._id;
+          setUserId(currentUserId);
+          setIsLiked(likes.includes(currentUserId));
+          const authordata = await axios.post(
+            "http://localhost:5000/user/getUserById",
+            { author },
+            { withCredentials: true }
+          );
+          setAuthorData(authordata?.data?.user);
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      };
 
-    fetchUserProfile();
+      fetchUserProfile();
+    }
   }, [likes, author]);
 
   const handleLike = async () => {
@@ -100,7 +104,7 @@ function PostCard({
 
         {/* Likes and Comments */}
         <div className="flex gap-4 items-center mb-2 text-gray-700">
-          <button  className="flex items-center">
+          <button className="flex items-center">
             <FaHeart
               onClick={handleLike}
               className={`mr-2 ${isLiked ? "text-red-500" : "text-gray-400"}`}

@@ -31,8 +31,14 @@ const router = createBrowserRouter([
         path: "/signup",
         element: <Signup />,
       },
+      // {
+      //   path: "/profile",
+      //   element: (
+      //     <ProtectedRoute element={<Profile />} />
+      //   ),
+      // },
       {
-        path: "/profile",
+        path: "/profile/:username",
         element: (
           <ProtectedRoute element={<Profile />} />
         ),

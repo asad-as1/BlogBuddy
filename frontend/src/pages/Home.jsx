@@ -41,20 +41,23 @@ function Home() {
     fetchData(); 
   }, []); 
 
+  if(token) {
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const res = await axios.get("http://localhost:5000/user/profile", {
+            withCredentials: true,
+          });
+          setUser(res?.data?.user);
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      };
+      fetchUserData();
+    }, []);
+  }
   
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/user/profile", {
-          withCredentials: true,
-        });
-        setUser(res?.data?.user);
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-      }
-    };
-    fetchUserData();
-  }, []);
+ 
   // console.log(user)
 
   if (authStatus && posts.length === 0) {

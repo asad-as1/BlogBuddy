@@ -8,14 +8,15 @@ dotenv.config();
 // Register a new user
 exports.register = async (req, res) => {
   try {
-    const { username, name, email, password } = req.body;
+    // console.log(req.body)
+    const { username, name, email, password, profilePicture, bio } = req.body;
     const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
     
-    const newUser = new User({ username, name, email, password });
+    const newUser = new User({ username, name, email, password, profilePicture, bio });
     await newUser.save();
 
     res.status(201).json({ message: 'User registered successfully', user: newUser });
@@ -23,7 +24,6 @@ exports.register = async (req, res) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-
 
 // Login an existing user
 exports.login = async (req, res) => {
@@ -41,7 +41,7 @@ exports.login = async (req, res) => {
     }
 
     // Generate a JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET, {
+    const token = jwt.sign({ userId: user._id, username: user.username }, process.env.SECRET, {
       expiresIn: '7d'
     });
    
@@ -71,12 +71,9 @@ exports.logout = (req, res) => {
   }
 };
 
-
-
 // Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    // console.log(req.user)
     const user = await User.findById(req.user._id).select('-password').populate('posts'); // Exclude the password field
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -88,6 +85,21 @@ exports.getProfile = async (req, res) => {
   }
 };
 
+exports.getUsername = async (req, res) => {
+  try {
+    const {username} = req.params;
+    // console.log(username)
+    const user = await User.findOne({ username }).select('-password').populate('posts');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const isOwnProfile = req.user.username === username;
+    res.status(200).json({ user, isOwnProfile });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
 
 // Get user by ID
 exports.getUserById = async (req, res) => {
@@ -105,21 +117,20 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-
-
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
     const { username, name, bio, profilePicture } = req.body;
+    // console.log(req.user._id.toString())
 
     // Find the user by ID and update the fields
     const updatedUser = await User.findByIdAndUpdate(
-      req.userId,
+      req.user._id.toString(),
       { username, name, bio, profilePicture },
       { new: true, runValidators: true }
     ).select('-password'); // Exclude the password field
 
-    res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
+    res.status(201).json({ message: 'Profile updated successfully', user: updatedUser });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error });
   }
@@ -129,7 +140,8 @@ exports.updateProfile = async (req, res) => {
 // Delete a user account and associated data
 exports.deleteUser = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user._id.toString();
+    // console.log(userId)
     const deletedUser = await User.findByIdAndDelete(userId);
 
     if (!deletedUser) {
