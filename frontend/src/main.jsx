@@ -12,6 +12,7 @@ import SinglePost from "./pages/SinglePost.jsx"
 import Profile from "./pages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Favourites from "./pages/Favourites.jsx";
+import EditProfile from "./pages/EditProfile.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,12 @@ const router = createBrowserRouter([
         path: "/profile",
         element: (
           <ProtectedRoute element={<Profile />} />
+        ),
+      },
+      {
+        path: "user/edit-profile",
+        element: (
+          <ProtectedRoute element={<EditProfile />} />
         ),
       },
       {

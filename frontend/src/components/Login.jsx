@@ -5,6 +5,25 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Cookie from "cookies-js";
 
+// Define the login function outside the component
+export const login = async (data, navigate, setError) => {
+  // console.log(data)
+  setError("");
+  try {
+    const res = await axios.post(`http://localhost:5000/user/login`, data);
+    if (res?.status === 200) {
+      const val = {
+        "httpOnly": true,
+        "secure": true
+      };
+      Cookie.set("token", res.data.token, val);
+      navigate("/");
+    }
+  } catch (error) {
+    setError(error.response?.data?.message || "Login failed. Please try again.");
+  }
+};
+
 function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
@@ -18,22 +37,9 @@ function Login() {
     }
   }, [navigate]);
 
-  const login = async (data) => {
-    setError("");
-    try {
-      const res = await axios.post(`http://localhost:5000/user/login`, data);
-      if (res?.status === 200) {
-        // alert("Successfully Logged In");
-        const val = {
-          "httpOnly": true,
-          "secure": true
-        };
-        Cookie.set("token", res.data.token, val);
-        navigate("/");
-      }
-    } catch (error) {
-      setError(error.response.data.message || "Login failed. Please try again.");
-    }
+  // Use the login function inside the component
+  const onSubmit = (data) => {
+    login(data, navigate, setError);
   };
 
   return (
@@ -52,7 +58,7 @@ function Login() {
           </Link>
         </p>
         {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
-        <form onSubmit={handleSubmit(login)} className="mt-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
           <div className="space-y-5">
             <Input
               label="Username: "

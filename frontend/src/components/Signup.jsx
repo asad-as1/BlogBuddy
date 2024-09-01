@@ -2,6 +2,7 @@ import React, {useState} from 'react'
 import {Link, useNavigate} from 'react-router-dom'
 import {Button, Input} from './index.js'
 import {useForm} from 'react-hook-form'
+import {login} from "./Login.jsx"
 import axios from "axios"
 
 function Signup() {
@@ -13,15 +14,16 @@ function Signup() {
       setError("");
       try {
         const res = await axios.post(`http://localhost:5000/user/register`, data);
-        console.log(res)
+        // console.log(res)
         if (res?.status === 201) {
           alert("Successfully Registered");
+          login(data, navigate, setError);
           navigate("/");
         }
         else alert("something went wrong");
       } catch (error) {
-        if(error.response.data.message == "User already exists")
-            setError(error.response.data.message);
+        if(error?.response?.data?.message == "User already exists")
+            setError(error?.response?.data?.message);
         else setError('Username is already taken')
         // console.log(error);
       }

@@ -12,8 +12,8 @@ function Home() {
 
   useEffect(() => {
     if (token) {
-      axios.get('/user/check-auth', {
-        headers: { Authorization: `Bearer ${token}` }
+      const res = axios.get('/user/check-auth', {
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then(response => {
         setAuthStatus(true); // User is authenticated
@@ -26,6 +26,7 @@ function Home() {
   }, [token]);
 
   const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,6 +40,22 @@ function Home() {
 
     fetchData(); 
   }, []); 
+
+  
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/user/profile", {
+          withCredentials: true,
+        });
+        setUser(res?.data?.user);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+    fetchUserData();
+  }, []);
+  // console.log(user)
 
   if (authStatus && posts.length === 0) {
     return (
@@ -77,11 +94,19 @@ function Home() {
       <Container>
         <div className='flex flex-wrap mt-4 justify-around'>
           {posts.map((post) => (
+            (user.role === "admin" ? ( // Only render if post is public
+              <div key={post._id} className='p-2 w-1/3'>
+                <PostCard {...post} />
+                {(post.isPublished !== "Public") && (
+                  <h2 className='text-center text-xl mt-1'>Private Post</h2>
+                )}
+              </div>
+            ):
             (post.isPublished === "Public") && ( // Only render if post is public
               <div key={post._id} className='p-2 w-1/3'>
                 <PostCard {...post} />
               </div>
-            )
+            ))
           ))}
         </div>
       </Container>

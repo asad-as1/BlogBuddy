@@ -52,6 +52,16 @@ function Profile() {
               <strong className="text-blue-950">Email:</strong> {user.email}
             </p>
           </div>
+          <div className="mt-4 flex justify-end">
+            <Button
+              className="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-indigo-950 hover:to-blue-900 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105 duration-300 ease-in-out"
+              onClick={() => {
+                navigate("/user/edit-profile");
+              }}
+            >
+              Edit Profile
+            </Button>
+          </div>
         </div>
 
         <div className="text-center mt-6">
