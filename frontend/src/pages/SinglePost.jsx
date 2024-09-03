@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import axios from "axios";
-import { FaHeart, FaComment, FaUser } from "react-icons/fa";
+import { FaHeart, FaComment, FaUser, FaShareAlt } from "react-icons/fa";
 
 export default function SinglePost() {
   const location = window.location.href.split("/");
@@ -48,6 +48,31 @@ export default function SinglePost() {
     fetchPostData();
   }, [id, loggedInUserId]);
 
+  // Function to handle sharing
+  const handleShare = () => {
+    const shareData = {
+      title: post?.title,
+      text: "Check out this post!",
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      navigator
+        .share(shareData)
+        .then(() => {
+          console.log("Post shared successfully!");
+        })
+        .catch((error) => {
+          console.error("Error sharing post:", error);
+        });
+    } else {
+      alert(
+        "Web Share API not supported in this browser. Copy the link to share."
+      );
+      // Fallback logic: you can copy the URL to the clipboard or show a modal with share options.
+    }
+  };
+
   const handleLike = async () => {
     if (!loggedInUserId) return;
 
@@ -71,8 +96,8 @@ export default function SinglePost() {
   const fetchLikesList = async () => {
     try {
       const res = await axios.get(`http://localhost:5000/post/${id}/likes`);
-      // console.log(first)
       setLikesList(res?.data?.likes);
+      // console.log(res.data.likes)
     } catch (error) {
       console.error("Failed to fetch likes list:", error);
     }
@@ -152,7 +177,7 @@ export default function SinglePost() {
       console.error("Failed to check Favourites:", error);
     }
   };
-  
+
   const deletePost = async () => {
     try {
       await axios.delete(`http://localhost:5000/post/${id}`, {
@@ -163,7 +188,7 @@ export default function SinglePost() {
       console.error("Failed to delete post:", error);
     }
   };
-  
+
   const handleDeleteComment = async (commentId) => {
     try {
       const res = await axios.delete(
@@ -177,10 +202,10 @@ export default function SinglePost() {
       console.error("Failed to delete comment:", error);
     }
   };
-  
+
   const isAuthor = loggedInUserId === post?.author?._id;
   const isAdmin = loggedInUserRole === "admin"; // Check if user is admin
-  
+
   useEffect(() => {
     checkIfPostIsFavorite();
     fetchLikesList();
@@ -233,17 +258,16 @@ export default function SinglePost() {
           {addedFav !== true ? (
             <Button
               bgColor="bg-blue-500"
-              className="mr-3"
-              onClick={() => addPostToFavorites(post?._id)} 
+              className="mr-3 h-10 px-4"
+              onClick={() => addPostToFavorites(post?._id)}
             >
               Add To Favourites
             </Button>
-          ) :
-           (
+          ) : (
             <Button
               bgColor="bg-blue-500"
-              className="mr-3"
-              onClick={() => RemoveFromFavorites(post?._id)} 
+              className="mr-3 h-10 px-4"
+              onClick={() => RemoveFromFavorites(post?._id)}
             >
               Remove From Favourites
             </Button>
@@ -251,15 +275,27 @@ export default function SinglePost() {
           {(isAuthor || isAdmin) && ( // Show delete button if the user is the author or an admin
             <>
               <Link to={`/edit-post/${post._id}`}>
-                <Button bgColor="bg-green-500" className="mr-3">
+                <Button bgColor="bg-green-500" className="mr-3 h-10 px-4">
                   Edit
                 </Button>
               </Link>
-              <Button bgColor="bg-red-500" onClick={deletePost}>
+              <Button
+                bgColor="bg-red-500"
+                className="h-10 px-4"
+                onClick={deletePost}
+              >
                 Delete
               </Button>
             </>
           )}
+          {/* Share Button */}
+          <Button
+            bgColor="bg-purple-500"
+            className="ml-3 h-10 px-4 flex items-center"
+            onClick={handleShare}
+          >
+            <FaShareAlt className="mr-2" /> Share
+          </Button>
         </div>
 
         {/* Post Stats: Likes and Comments Sections */}
@@ -284,7 +320,7 @@ export default function SinglePost() {
                     className="flex items-center justify-around p-1 gap-2 mb-2"
                   >
                     <Link
-                      to={`/profile/${user._id}`}
+                      to={`/profile/${user.username}`}
                       className="flex items-center gap-2 w-1/2"
                     >
                       {user.profileImage ? (
@@ -301,7 +337,7 @@ export default function SinglePost() {
 
                     <div>
                       <Button bgColor="bg-blue-500" className="ml-4">
-                        <Link to={`/profile/${user._id}`}>View Profile</Link>
+                        <Link to={`/profile/${user.username}`}>View Profile</Link>
                       </Button>
                     </div>
                   </div>
@@ -335,7 +371,9 @@ export default function SinglePost() {
                         <FaUser className="w-6 h-6 text-gray-500" />
                       )}
                       <span className="font-semibold">
-                        <Link to={`/profile/${comment.user._id}`}>@{comment.user.username}</Link>
+                        <Link to={`/profile/${comment.user.username}`}>
+                          @{comment.user.username}
+                        </Link>
                       </span>
                     </div>
                     <p className="text-gray-700 break-words bg-gray-300 p-2 rounded-lg mb-2">

@@ -82,6 +82,7 @@ function PostCard({
               autoPlay
               muted
               loop
+              loading="lazy"
               className="w-full h-48 object-fit shadow-lg"
             >
               <source src={mediaUrl} type="video/mp4" />
@@ -91,6 +92,7 @@ function PostCard({
             <img
               src={mediaUrl}
               alt={title}
+              loading="lazy"
               className="w-full h-48 object-fit shadow-xl"
             />
           )}
