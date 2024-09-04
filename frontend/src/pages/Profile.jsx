@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import Button from "../components/Button";
 import { useNavigate, useParams } from "react-router-dom";
-import Cookie from "cookies-js"
+import Cookie from "cookies-js";
 
 function Profile() {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ function Profile() {
         withCredentials: true,
       });
       Cookie.expire('token'); 
-      alert("Account Deleted Successfully!")
+      alert("Account Deleted Successfully!");
       navigate("/login"); // Redirect to home or login page after deletion
     } catch (error) {
       console.error("Failed to delete account:", error);
@@ -54,36 +54,32 @@ function Profile() {
   return (
     <Container>
       <div className="w-full py-8 min-h-screen">
-        <div className="max-w-md mx-auto p-8 bg-white shadow-xl rounded-lg border border-gray-300">
-          <div className="flex items-center space-x-4">
+        <div className="max-w-md mx-auto p-6 sm:p-8 bg-white shadow-xl rounded-lg border border-gray-300">
+          <div className="flex flex-col justify-between items-center sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
             {/* Profile Picture or User Icon */}
             {user.profilePicture ? (
               <img
                 src={user.profilePicture}
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-blue-900"
+                className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover border-4 border-blue-900"
               />
             ) : (
-              <FaUserCircle className="w-24 h-24 text-blue-950" />
+              <FaUserCircle className="w-24 h-24 sm:w-32 sm:h-32 text-blue-950" />
             )}
-            <div>
-              <h2 className="text-3xl font-extrabold text-blue-950">
+            <div className="text-center sm:text-left">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-blue-950">
                 {user.username}
               </h2>
-              <p className="text-gray-900 text-xl mt-2">{user.name}</p>
+              <p className="text-gray-900 text-lg mt-2">{user.name}</p>
 
               {/* Total Number of Posts and Hidden (Private) Posts */}
-              <div className="flex justify-between gap-4">
+              <div className="flex flex-col sm:flex-row justify-center sm:justify-between gap-4 mt-4">
                 <div className="mt-2 text-center">
-                  <strong className="text-blue-950 text-center">
-                    {posts.length}
-                  </strong>
+                  <strong className="text-blue-950 text-2xl">{posts.length}</strong>
                   <p className="text-gray-900 text-lg">Posts</p>
                 </div>
                 <div className="mt-2 text-center">
-                  <strong className="text-blue-950 text-center">
-                    {totalHiddenPosts}
-                  </strong>
+                  <strong className="text-blue-950 text-2xl">{totalHiddenPosts}</strong>
                   <p className="text-gray-900 text-lg">Private Posts</p>
                 </div>
               </div>
@@ -102,25 +98,19 @@ function Profile() {
             )}
           </div>
           {isOwnProfile && (
-            <div className="mt-4 flex justify-between">
+            <div className="mt-4 flex flex-col sm:flex-row justify-between gap-4">
               <Button
                 className="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-indigo-950 hover:to-blue-900 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105 duration-300 ease-in-out"
-                onClick={() => {
-                  navigate("/user/edit-profile");
-                }}
+                onClick={() => navigate("/user/edit-profile")}
               >
                 Edit Profile
               </Button>
-              {isOwnProfile && (
-                // <div>
-                  <Button
-                    className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105 duration-300 ease-in-out"
-                    onClick={handleDeleteAccount}
-                  >
-                    Delete Account
-                  </Button>
-                // </div>
-              )}
+              <Button
+                className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105 duration-300 ease-in-out"
+                onClick={handleDeleteAccount}
+              >
+                Delete Account
+              </Button>
             </div>
           )}
         </div>
@@ -129,9 +119,7 @@ function Profile() {
           <div className="text-center mt-6">
             <Button
               className="bg-gradient-to-r from-blue-900 to-blue-950 hover:from-indigo-950 hover:to-blue-900 text-white font-bold py-3 px-6 rounded-full transition-transform transform hover:scale-105 duration-300 ease-in-out"
-              onClick={() => {
-                navigate("/user/favourites");
-              }}
+              onClick={() => navigate("/user/favourites")}
             >
               Your Favourites
             </Button>
@@ -140,14 +128,14 @@ function Profile() {
 
         <hr className="border-black mt-10" />
         <div>
-          <h1 className="mt-5 text-center text-4xl font-extrabold text-blue-950">
+          <h1 className="mt-5 text-center text-3xl sm:text-4xl font-extrabold text-blue-950">
             All Posts
           </h1>
-          <div className="flex flex-wrap justify-around mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
             {posts
               .filter((post) => isOwnProfile || post.isPublished === "Public")
               .map((post) => (
-                <div key={post._id} className="p-4 w-1/3">
+                <div key={post._id} className="p-4">
                   <PostCard {...post} />
                   {isOwnProfile && (
                     <h2 className="text-center text-xl mt-2">

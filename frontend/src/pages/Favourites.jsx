@@ -19,17 +19,16 @@ const Favourites = () => {
 
     fetchData();
   }, []);
-  // console.log(posts.length)
 
   return (
     <div className="w-full py-8">
       <Container>
         {posts.length > 0 ? (
-          <div className="flex flex-wrap mt-4 justify-around">
+          <div className="flex flex-wrap mt-4 justify-center sm:justify-between gap-4">
             {posts.map(
               (post) =>
                 post.isPublished === "Public" && ( // Only render if post is public
-                  <div key={post._id} className="p-2 w-1/3">
+                  <div key={post._id} className="p-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
                     <PostCard {...post} />
                   </div>
                 )

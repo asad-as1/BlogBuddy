@@ -203,6 +203,8 @@ export default function SinglePost() {
     }
   };
 
+  // console.log(likesList)
+
   const isAuthor = loggedInUserId === post?.author?._id;
   const isAdmin = loggedInUserRole === "admin"; // Check if user is admin
 
@@ -235,7 +237,7 @@ export default function SinglePost() {
             />
           )}
         </div>
-
+  
         {/* Post Details */}
         <div className="w-full mb-6">
           <h1 className="text-3xl font-bold mb-2">{post?.title}</h1>
@@ -243,7 +245,7 @@ export default function SinglePost() {
             {parse(post?.content || "")}
           </div>
           <p className="mb-4 flex items-center">
-            Posted by :
+            Posted by:
             <Link
               to={`/profile/${post?.author?._id}`}
               className="ml-2 font-semibold"
@@ -252,13 +254,13 @@ export default function SinglePost() {
             </Link>
           </p>
         </div>
-
+  
         {/* Bottom Buttons */}
-        <div className="flex justify-center mt-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-2 justify-center mt-4 mb-6">
           {addedFav !== true ? (
             <Button
               bgColor="bg-blue-500"
-              className="mr-3 h-10 px-4"
+              className="mb-3 md:mb-0 md:mr-3 h-10 px-4"
               onClick={() => addPostToFavorites(post?._id)}
             >
               Add To Favourites
@@ -266,22 +268,22 @@ export default function SinglePost() {
           ) : (
             <Button
               bgColor="bg-blue-500"
-              className="mr-3 h-10 px-4"
+              className="mb-3 md:mb-0 md:mr-3 h-10 px-4"
               onClick={() => RemoveFromFavorites(post?._id)}
             >
               Remove From Favourites
             </Button>
           )}
-          {(isAuthor || isAdmin) && ( // Show delete button if the user is the author or an admin
+          {(isAuthor || isAdmin) && (
             <>
               <Link to={`/edit-post/${post._id}`}>
-                <Button bgColor="bg-green-500" className="mr-3 h-10 px-4">
+                <Button bgColor="bg-green-500" className="w-full mb-3 md:mb-0 md:mr-3 h-10 px-4">
                   Edit
                 </Button>
               </Link>
               <Button
                 bgColor="bg-red-500"
-                className="h-10 px-4"
+                className="mb-3 md:mb-0 h-10 px-4"
                 onClick={deletePost}
               >
                 Delete
@@ -291,55 +293,52 @@ export default function SinglePost() {
           {/* Share Button */}
           <Button
             bgColor="bg-purple-500"
-            className="ml-3 h-10 px-4 flex items-center"
+            className="h-10 px-4 flex items-center justify-center"
             onClick={handleShare}
           >
             <FaShareAlt className="mr-2" /> Share
           </Button>
         </div>
-
+  
         {/* Post Stats: Likes and Comments Sections */}
-        <div className="flex gap-8 mb-4">
+        <div className="flex flex-col md:flex-row gap-8 mb-4">
           {/* Likes Section */}
-          <div className="w-1/2">
-            <div className="flex items-center ">
+          <div className="w-full md:w-1/2">
+            <div className="flex items-center mb-4">
               <FaHeart
                 onClick={handleLike}
-                className={`mr-2 mb-3 cursor-pointer ${
+                className={`mr-2 cursor-pointer ${
                   isLiked ? "text-red-500" : "text-gray-400"
                 }`}
                 size={20}
               />
-              <h2 className="text-xl font-bold mb-4">Likes ({likeCount})</h2>
+              <h2 className="text-xl font-bold">Likes ({likeCount})</h2>
             </div>
             <div className="bg-gray-100 p-4 rounded-lg shadow-md h-72 overflow-y-auto">
               {likesList.length > 0 ? (
                 likesList.map((user) => (
                   <div
                     key={user._id}
-                    className="flex items-center justify-around p-1 gap-2 mb-2"
+                    className="flex items-center justify-between p-2 mb-2"
                   >
                     <Link
                       to={`/profile/${user.username}`}
-                      className="flex items-center gap-2 w-1/2"
+                      className="flex items-center gap-2"
                     >
-                      {user.profileImage ? (
+                      {user.profilePicture ? (
                         <img
-                          src={user.profileImage}
+                          src={user.profilePicture}
                           alt={user.username}
-                          className="w-8 h-8 rounded-full object-cover"
+                          className="w-10 h-10 rounded-full object-cover"
                         />
                       ) : (
-                        <FaUser className="w-8 h-8 text-gray-600" />
+                        <FaUser className="w-6 h-7 text-gray-600" />
                       )}
-                      <span className="mt-4 text-lg">{user.username}</span>
+                      <span className="text-md">{user.username}</span>
                     </Link>
-
-                    <div>
-                      <Button bgColor="bg-blue-500" className="ml-4">
-                        <Link to={`/profile/${user.username}`}>View Profile</Link>
-                      </Button>
-                    </div>
+                    <Button bgColor="bg-blue-500" className="text-sm">
+                      <Link to={`/profile/${user.username}`}>View Profile</Link>
+                    </Button>
                   </div>
                 ))
               ) : (
@@ -347,12 +346,12 @@ export default function SinglePost() {
               )}
             </div>
           </div>
-
+  
           {/* Comments Section */}
-          <div className="w-1/2">
-            <div className="flex items-center">
-              <FaComment className="mr-2 mb-3 text-gray-400 text-xl" />
-              <h2 className="text-xl font-bold mb-4">
+          <div className="w-full md:w-1/2">
+            <div className="flex items-center mb-4">
+              <FaComment className="mr-2 text-gray-400 text-xl" />
+              <h2 className="text-xl font-bold">
                 Comments ({commentsList.length || 0})
               </h2>
             </div>
@@ -361,14 +360,14 @@ export default function SinglePost() {
                 commentsList.map((comment) => (
                   <div key={comment._id} className="mb-4">
                     <div className="flex items-center gap-2 mb-2">
-                      {comment.user.profileImage ? (
+                      {comment.user.profilePicture ? (
                         <img
-                          src={comment.user.profileImage}
+                          src={comment.user.profilePicture}
                           alt={comment.user.username}
-                          className="w-6 h-6 rounded-full object-cover"
+                          className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <FaUser className="w-6 h-6 text-gray-500" />
+                        <FaUser className="w-6 h-7 text-gray-500" />
                       )}
                       <span className="font-semibold">
                         <Link to={`/profile/${comment.user.username}`}>
@@ -376,7 +375,7 @@ export default function SinglePost() {
                         </Link>
                       </span>
                     </div>
-                    <p className="text-gray-700 break-words bg-gray-300 p-2 rounded-lg mb-2">
+                    <p className="text-gray-700 bg-gray-300 p-2 rounded-lg mb-2">
                       {comment.comment}
                     </p>
                     {(comment?.user?._id === loggedInUserId ||
@@ -385,7 +384,7 @@ export default function SinglePost() {
                         <Button
                           bgColor="bg-blue-500"
                           onClick={() => handleDeleteComment(comment._id)}
-                          className="ml-4"
+                          className="text-sm"
                         >
                           Delete
                         </Button>
@@ -397,17 +396,17 @@ export default function SinglePost() {
                 <p className="text-center text-gray-500">No Comments Yet</p>
               )}
             </div>
-
+  
             {/* Add Comment Section */}
             <div className="bottom-0 left-0 w-full p-4 bg-gray-100 rounded-lg mt-3 flex flex-col gap-2">
               <textarea
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Add a comment..."
-                className="flex-grow w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md"
                 required
               />
-
+  
               {/* Error Message */}
               {isCommentEmpty && (
                 <p className="text-red-500 text-sm mt-1">Write Something !</p>
@@ -415,7 +414,7 @@ export default function SinglePost() {
               <div className="flex justify-end">
                 <Button
                   bgColor="bg-blue-500"
-                  className="text-sm w1/2 py-2 rounded-md"
+                  className="text-sm w-1/2 py-2 rounded-md"
                   onClick={handleAddComment}
                 >
                   Add Comment
@@ -427,4 +426,5 @@ export default function SinglePost() {
       </Container>
     </div>
   ) : null;
+  
 }

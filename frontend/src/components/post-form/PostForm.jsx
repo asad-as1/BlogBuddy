@@ -63,34 +63,32 @@ export default function PostForm({ post }) {
     }
   };
   
+  const handleMediaChange = (e) => {
+    const file = e.target.files[0];
+    
+    if (file) {
+      const fileType = file.type.split("/")[0];
+      setIsVideo(fileType === "video");
 
- const handleMediaChange = (e) => {
-  const file = e.target.files[0];
-  // console.log(file)
-  
-  if (file) {
-    const fileType = file.type.split("/")[0];
-    setIsVideo(fileType === "video");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMediaPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setMediaPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    setValue("media", file); // Set the new media file
-    setUploadProgress(0);
-    setUploadTime(null);
-  } else {
-    setMediaPreview("");
-    setIsVideo(false);
-    setValue("media", null); // Clear the media file
-  }
-};
+      setValue("media", file); // Set the new media file
+      setUploadProgress(0);
+      setUploadTime(null);
+    } else {
+      setMediaPreview("");
+      setIsVideo(false);
+      setValue("media", null); // Clear the media file
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
-      <div className="w-2/3 px-2">
+    <form onSubmit={handleSubmit(submit)} className="flex flex-col sm:flex-row flex-wrap">
+      <div className="w-full sm:w-2/3 px-2 mb-4 sm:mb-0">
         <Input
           label="Title :"
           placeholder="Title"
@@ -105,7 +103,7 @@ export default function PostForm({ post }) {
         />
         <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
       </div>
-      <div className="w-1/3 px-2">
+      <div className="w-full sm:w-1/3 px-2">
         <Input
           label="Featured Media :"
           type="file"
@@ -116,7 +114,7 @@ export default function PostForm({ post }) {
         {mediaPreview && (
           <div className="w-full mb-4">
             {isVideo ? (
-              <video controls className="rounded-lg">
+              <video controls className="w-full rounded-lg">
                 <source src={mediaPreview} type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
@@ -124,7 +122,7 @@ export default function PostForm({ post }) {
               <img
                 src={mediaPreview}
                 alt="Featured"
-                className="rounded-lg"
+                className="w-full rounded-lg"
               />
             )}
           </div>

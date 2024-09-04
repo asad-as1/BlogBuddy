@@ -5,23 +5,30 @@ import { useForm } from "react-hook-form";
 import { login } from "./Login.jsx";
 import { upload } from "../firebase.js";
 import axios from "axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the eye icons
 
 function Signup({ user }) {
-  const { register, handleSubmit, reset, setValue, control, getValues } =
-    useForm({
-      defaultValues: {
-        username: "",
-        name: "",
-        email: "",
-        bio: "",
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    control,
+    getValues,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      username: "",
+      name: "",
+      email: "",
+      bio: "",
+    },
+  });
 
   const navigate = useNavigate();
   const [error, setError] = useState("");
-  // console.log(user)
+  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
 
-  // Use useEffect to reset the form when the user prop changes
   useEffect(() => {
     if (user) {
       reset({
@@ -36,34 +43,31 @@ function Signup({ user }) {
   const handleRegister = async (data) => {
     setError("");
     try {
-      // Check if a new profile picture is being uploaded
       if (data.profilePicture && data.profilePicture.length > 0) {
         const file = data.profilePicture[0];
         const url = await upload(file);
         data.profilePicture = url;
       } else {
-        data.profilePicture = user?.profilePicture || ""; // Retain existing profile picture if not uploading a new one
+        data.profilePicture = user?.profilePicture || "";
       }
-  
+
       let res;
       if (user) {
-        // If user is editing their profile
         res = await axios.put(`http://localhost:5000/user/profile`, data, {
           withCredentials: true,
         });
-          if (res?.status === 200) {
+        if (res?.status === 200) {
           alert("Profile Updated Successfully");
         }
       } else {
-        // If user is registering a new account
         res = await axios.post(`http://localhost:5000/user/register`, data);
         if (res?.status === 201) {
           alert("Successfully Registered");
           login(data, navigate, setError);
         }
       }
-  
-      if (res.status == 201) {
+
+      if (res.status === 201) {
         navigate(`/profile/${user?.username}`);
       } else {
         alert("Something went wrong");
@@ -76,21 +80,24 @@ function Signup({ user }) {
     }
     reset();
   };
-  
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState);
+  };
 
   return (
-    <div className="flex items-center justify-center">
-      <div className="mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10">
+    <div className="flex items-center justify-center min-h-screen p-4">
+      <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
         {!user && (
           <div>
-            <h2 className="text-center text-2xl font-bold leading-tight">
-              Sign up to create account
+            <h2 className="text-center text-xl sm:text-2xl font-bold leading-tight mb-4">
+              Sign up to create an account
             </h2>
-            <p className="mt-2 text-center text-base text-black/60">
+            <p className="text-center text-sm sm:text-base text-black/60 mb-4">
               Already have an account?&nbsp;
               <Link
                 to="/login"
-                className="font-medium text-primary transition-all duration-200 hover:underline"
+                className="font-medium text-blue-600 transition-all duration-200 hover:underline"
               >
                 Sign In
               </Link>
@@ -99,21 +106,22 @@ function Signup({ user }) {
         )}
         {user && (
           <div>
-            <h2 className="text-center text-2xl font-bold leading-tight">
+            <h2 className="text-center text-xl sm:text-2xl font-bold leading-tight mb-4">
               Edit Your Profile
             </h2>
           </div>
         )}
-        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
-        <form onSubmit={handleSubmit(handleRegister)}>
-          <div className="space-y-5">
+        <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
+          <div className="space-y-4">
             <Input
               label="Username: "
               placeholder="Username"
               {...register("username", {
                 required: true,
               })}
+              className="w-full"
             />
             <Input
               label="Full Name: "
@@ -121,6 +129,7 @@ function Signup({ user }) {
               {...register("name", {
                 required: true,
               })}
+              className="w-full"
             />
             <Input
               label="Email: "
@@ -129,24 +138,53 @@ function Signup({ user }) {
               {...register("email", {
                 required: true,
                 validate: {
-                  matchPatern: (value) =>
+                  matchPattern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
                     "Email address must be a valid address",
                 },
               })}
+              className="w-full"
             />
-            {
-              !user && (
-
-            <Input
-              label="Password: "
-              type="password"
-              placeholder="Enter your password"
-              {...register("password", {
-                required: true,
-              })}
-            />
-              )}
+            {!user && (
+              <div>
+                <div className="relative">
+                  <Input
+                    label="Password: "
+                    type={showPassword ? "text" : "password"} // Toggle between text and password
+                    placeholder="Enter your password"
+                    {...register("password", {
+                      required: "Password is required",
+                      validate: {
+                        minLength: (value) =>
+                          value.length >= 8 ||
+                          "Password must be at least 8 characters long",
+                        hasUpperCase: (value) =>
+                          /[A-Z]/.test(value) ||
+                          "Password must contain at least one uppercase letter",
+                        hasSpecialChar: (value) =>
+                          /[!@#$%^&*(),.?":{}|<>]/.test(value) ||
+                          "Password must contain at least one special character",
+                        hasDigit: (value) =>
+                          /\d/.test(value) ||
+                          "Password must contain at least one digit",
+                      },
+                    })}
+                    className="w-full"
+                  />
+                  <span
+                    className="absolute bottom-3 right-0 flex items-center pr-3 cursor-pointer text-gray-500"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
+                {errors.password && (
+                  <p className="text-red-600 text-center mt-2">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+            )}
             <Input
               label="Bio: "
               type="text"
@@ -154,25 +192,27 @@ function Signup({ user }) {
               {...register("bio", {
                 required: false,
               })}
+              className="w-full"
             />
             {user && user.profilePicture && (
-              <div>
+              <div className="text-center">
                 <img
                   src={user.profilePicture}
                   alt="Profile"
                   className="mb-2 rounded-full h-24 w-24 mx-auto"
                 />
-                <p className="text-center text-gray-500">Current Profile Picture</p>
+                <p className="text-gray-500">Current Profile Picture</p>
               </div>
             )}
             <Input
               label="Profile Picture"
               type="file"
               {...register("profilePicture", {
-                required: false, // Not required when editing
+                required: false,
               })}
+              className="w-full"
             />
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full mt-4">
               {user ? "Save Changes" : "Create Account"}
             </Button>
           </div>

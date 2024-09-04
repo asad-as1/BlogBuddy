@@ -4,17 +4,17 @@ import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import Cookie from "cookies-js";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 // Define the login function outside the component
 export const login = async (data, navigate, setError) => {
-  // console.log(data)
   setError("");
   try {
     const res = await axios.post(`http://localhost:5000/user/login`, data);
     if (res?.status === 200) {
       const val = {
-        "httpOnly": true,
-        "secure": true
+        httpOnly: true,
+        secure: true,
       };
       Cookie.set("token", res.data.token, val);
       navigate("/");
@@ -28,6 +28,7 @@ function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const token = Cookie.get("token");
@@ -43,38 +44,52 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full mt-20 mb-20">
-      <div className={`mx-auto w-full max-w-lg bg-gray-100 rounded-xl p-10 border border-black/10`}>
-        <h2 className="text-center text-2xl font-bold leading-tight">
+    <div className="flex items-center justify-center w-full mt-12 mb-12 px-4">
+      <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
+        <h2 className="text-center text-2xl font-bold leading-tight mb-4">
           Sign in to your account
         </h2>
-        <p className="mt-2 text-center text-base text-black/60">
+        <p className="text-center text-base text-black/60 mb-4">
           Don&apos;t have an account?&nbsp;
           <Link
             to="/signup"
-            className="font-medium text-primary transition-all duration-200 hover:underline"
+            className="font-medium text-blue-600 hover:underline"
           >
             Sign Up
           </Link>
         </p>
-        {error && <p className="text-red-600 mt-8 text-center">{error}</p>}
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-          <div className="space-y-5">
+        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div className="space-y-4">
             <Input
               label="Username: "
               placeholder="Enter your username"
               {...register("username", {
                 required: true,
               })}
+              className="w-full"
             />
-            <Input
-              label="Password: "
-              type="password"
-              placeholder="Enter your password"
-              {...register("password", {
-                required: true,
-              })}
-            />
+            <div className="relative">
+              <Input
+                label="Password: "
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                {...register("password", {
+                  required: true,
+                })}
+                className="w-full"
+              />
+              <div
+                className="absolute bottom-3 right-0 flex items-center pr-3 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <FaEyeSlash className="text-gray-600" />
+                ) : (
+                  <FaEye className="text-gray-600" />
+                )}
+              </div>
+            </div>
             <Button type="submit" className="w-full">
               Sign in
             </Button>

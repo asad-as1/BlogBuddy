@@ -261,8 +261,13 @@ exports.fetchLikesList = async (req, res) => {
   const { postId } = req.params;
 
   try {
-    const post = await Post.findById(postId).populate("likes", "username"); // Populating only the 'username' field of the User
-
+    const post = await Post.findById(postId)
+    .populate({
+      path: 'likes',
+      select: 'username profilePicture' // Only select specific fields
+    })
+    .exec();
+  
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }

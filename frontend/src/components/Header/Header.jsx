@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { Container, LogoutBtn } from '../index';
-import { useNavigate } from 'react-router-dom';
-import Cookie from 'cookies-js';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { Container } from "../index";
+import { useNavigate } from "react-router-dom";
+import Cookie from "cookies-js";
+import axios from "axios";
+import { FaBars } from "react-icons/fa";
 
 function Header() {
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState(false);
   const [user, setUser] = useState(null);
-  const token = Cookie.get('token');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const token = Cookie.get("token");
 
   useEffect(() => {
     const checkAuth = async () => {
       if (token) {
         try {
-          await axios.get('/user/check-auth', {
-            headers: { Authorization: `Bearer ${token}` }
+          await axios.get("/user/check-auth", {
+            headers: { Authorization: `Bearer ${token}` },
           });
-          setAuthStatus(true); // User is authenticated
+          setAuthStatus(true);
         } catch (error) {
-          setAuthStatus(false); // User is not authenticated
-          console.error('Authentication check failed', error);
+          setAuthStatus(false);
+          console.error("Authentication check failed", error);
         }
       } else {
         setAuthStatus(false);
@@ -34,7 +36,7 @@ function Header() {
     if (authStatus) {
       const fetchUserData = async () => {
         try {
-          const res = await axios.get('http://localhost:5000/user/profile', {
+          const res = await axios.get("http://localhost:5000/user/profile", {
             withCredentials: true,
           });
           setUser(res.data.user);
@@ -50,18 +52,20 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/user/logout', { withCredentials: true });
-      Cookie.expire('token');
+      await axios.post("http://localhost:5000/user/logout", {
+        withCredentials: true,
+      });
+      Cookie.expire("token");
       setAuthStatus(false);
       setUser(null);
-      navigate('/login'); // Redirect to login page
+      navigate("/login");
     } catch (error) {
-      console.error('Failed to log out:', error);
+      console.error("Failed to log out:", error);
     }
   };
 
   const navItems = [
-    { name: 'Home', slug: "/", active: true },
+    { name: "Home", slug: "/", active: true },
     { name: "Login", slug: "/login", active: !authStatus },
     { name: "Signup", slug: "/signup", active: !authStatus },
     { name: "Profile", slug: `/profile/${user?.username}`, active: authStatus },
@@ -70,27 +74,70 @@ function Header() {
   ];
 
   return (
-    <header className='py-3 shadow bg-blue-950 text-white'>
+    <header className="shadow bg-blue-950 text-white">
       <Container>
-        <nav className='flex items-center justify-around'>
-          <ul className='flex'>
-            {navItems.map((item) => 
-              item.active && (
-                <li key={item.name}>
-                  <button
-                    onClick={() => navigate(item.slug)}
-                    className='inline-block px-6 py-2 duration-200 hover:bg-blue-900 rounded-full'
-                  >
-                    {item.name}
-                  </button>
-                </li>
-              )
+        <nav className="flex items-center justify-between">
+          {/* Hamburger Menu for Small Screens */}
+          <div className="relative w-full md:hidden">
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-white p-3"
+            >
+              <FaBars size={28} />
+            </button>
+            {isMenuOpen && (
+              <div className="absolute top-12 w-48 bg-blue-950 rounded-lg shadow-lg z-10">
+                <ul className="p-2">
+                  {navItems.map(
+                    (item) =>
+                      item.active && (
+                        <li key={item.name} className="mb-2">
+                          <button
+                            onClick={() => {
+                              navigate(item.slug);
+                              setIsMenuOpen(false);
+                            }}
+                            className="block px-4 py-2 rounded-full hover:bg-blue-900 text-left"
+                          >
+                            {item.name}
+                          </button>
+                        </li>
+                      )
+                  )}
+                  {authStatus && (
+                    <li>
+                      <button
+                        onClick={handleLogout}
+                        className="block px-4 py-2 rounded-full hover:bg-red-700 text-left"
+                      >
+                        Logout
+                      </button>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+          </div>
+          {/* Navigation Items */}
+          <ul className="hidden md:flex md:items-center md:justify-center md:h-20 md:w-full">
+            {navItems.map(
+              (item) =>
+                item.active && (
+                  <li key={item.name} className="mb-4 md:mb-0">
+                    <button
+                      onClick={() => navigate(item.slug)}
+                      className="block px-4 py-2 rounded-full hover:bg-blue-900 text-center"
+                    >
+                      {item.name}
+                    </button>
+                  </li>
+                )
             )}
             {authStatus && (
               <li>
                 <button
                   onClick={handleLogout}
-                  className='inline-block px-6 py-2 duration-200 hover:bg-red-700 rounded-full'
+                  className="block px-4 py-2 rounded-full hover:bg-red-700 text-center"
                 >
                   Logout
                 </button>

@@ -56,9 +56,6 @@ function Home() {
       fetchUserData();
     }, []);
   }
-  
- 
-  // console.log(user)
 
   if (authStatus && posts.length === 0) {
     return (
@@ -95,10 +92,10 @@ function Home() {
   return (
     <div className='w-full py-8'>
       <Container>
-        <div className='flex flex-wrap mt-4 justify-around'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           {posts.map((post) => (
             (user.role === "admin" ? ( // Only render if post is public
-              <div key={post._id} className='p-2 w-1/3'>
+              <div key={post._id} className='p-2'>
                 <PostCard {...post} />
                 {(post.isPublished !== "Public") && (
                   <h2 className='text-center text-xl mt-1'>Private Post</h2>
@@ -106,7 +103,7 @@ function Home() {
               </div>
             ):
             (post.isPublished === "Public") && ( // Only render if post is public
-              <div key={post._id} className='p-2 w-1/3'>
+              <div key={post._id} className='p-2'>
                 <PostCard {...post} />
               </div>
             ))
