@@ -16,5 +16,6 @@ router.get('/favourites', authenticate, userController.fetchFavourites);
 router.get('/removeFavourites/:postId', authenticate, userController.RemoveFromFavorites);
 router.get('/favourites/:postId', authenticate, userController.addPostToFavorites);
 router.get('/favourites/check/:postId', authenticate, userController.isPostInFavourites);
+router.get('/search', authenticate, userController.searchUsers);
 
 module.exports = router;

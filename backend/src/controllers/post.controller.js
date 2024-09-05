@@ -299,3 +299,27 @@ exports.fetchCommentsList = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+exports.searchPosts = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Search query is required' });
+  }
+
+  try {
+    // Perform search based on the query (e.g., title, categories, or author)
+    const posts = await Post.find({
+      $or: [
+        { title: { $regex: query, $options: 'i' } }, // Case-insensitive search for title
+        { categories: { $elemMatch: { $regex: query, $options: 'i' } } }, // Case-insensitive search for categories
+        { author: { $in: await User.find({ name: { $regex: query, $options: 'i' } }).distinct('_id') } } // Match author ID based on the user name
+      ]
+    });
+
+    res.json(posts);
+  } catch (err) {
+    console.error('Error searching posts:', err);
+    res.status(500).json({ error: 'Failed to search posts' });
+  }
+};

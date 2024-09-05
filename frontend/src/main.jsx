@@ -13,6 +13,7 @@ import Profile from "./pages/Profile.jsx";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Favourites from "./pages/Favourites.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
+import Search from "./pages/Search.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,12 +32,12 @@ const router = createBrowserRouter([
         path: "/signup",
         element: <Signup />,
       },
-      // {
-      //   path: "/profile",
-      //   element: (
-      //     <ProtectedRoute element={<Profile />} />
-      //   ),
-      // },
+      {
+        path: "/search",
+        element: (
+          <ProtectedRoute element={<Search />} />
+        ),
+      },
       {
         path: "/profile/:username",
         element: (

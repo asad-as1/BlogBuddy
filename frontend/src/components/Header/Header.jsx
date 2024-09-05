@@ -70,6 +70,7 @@ function Header() {
     { name: "Signup", slug: "/signup", active: !authStatus },
     { name: "Profile", slug: `/profile/${user?.username}`, active: authStatus },
     { name: "Add Post", slug: "/add-post", active: authStatus },
+    { name: "Search", slug: "/search", active: authStatus },
     { name: "Favourites", slug: "/user/favourites", active: authStatus },
   ];
 

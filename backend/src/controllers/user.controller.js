@@ -264,3 +264,28 @@ exports.fetchFavourites = async (req, res) => {
   }
 };
 
+
+exports.searchUsers = async (req, res) => {
+  // console.log(req)
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: 'Search query is required' });
+  }
+
+  try {
+    // Perform search based on the query (e.g., username or name)
+    const users = await User.find({
+      $or: [
+        { username: { $regex: query, $options: 'i' } }, // Case-insensitive search for username
+        { name: { $regex: query, $options: 'i' } } // Case-insensitive search for name
+      ]
+    });
+
+    res.json(users);
+  } catch (err) {
+    console.error('Error searching users:', err);
+    res.status(500).json({ error: 'Failed to search users' });
+  }
+};
+

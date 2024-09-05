@@ -13,6 +13,7 @@ router.post('/:postId/like', authenticate, postController.likePost);
 router.post('/:postId/unlike', authenticate, postController.unlikePost);
 router.post('/:postId/comment', authenticate, postController.addComment);
 router.delete('/:postId/comment/:commentId', authenticate, postController.deleteComment);
+router.get('/search', authenticate, postController.searchPosts);
 
 router.get('/:postId/likes', postController.fetchLikesList);
 router.get('/:postId/comments', postController.fetchCommentsList);
