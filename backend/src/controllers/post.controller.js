@@ -300,6 +300,7 @@ exports.fetchCommentsList = async (req, res) => {
   }
 };
 
+
 exports.searchPosts = async (req, res) => {
   const { query } = req.query;
 
@@ -308,12 +309,15 @@ exports.searchPosts = async (req, res) => {
   }
 
   try {
-    // Perform search based on the query (e.g., title, categories, or author)
+    // Find user IDs that match the author's name
+    const authorIds = await User.find({ name: { $regex: query, $options: 'i' } }).distinct('_id');
+
+    // Perform search based on the query (title, categories, or author ID)
     const posts = await Post.find({
       $or: [
         { title: { $regex: query, $options: 'i' } }, // Case-insensitive search for title
         { categories: { $elemMatch: { $regex: query, $options: 'i' } } }, // Case-insensitive search for categories
-        { author: { $in: await User.find({ name: { $regex: query, $options: 'i' } }).distinct('_id') } } // Match author ID based on the user name
+        { author: { $in: authorIds } } // Match posts by author ID(s)
       ]
     });
 
@@ -323,3 +327,4 @@ exports.searchPosts = async (req, res) => {
     res.status(500).json({ error: 'Failed to search posts' });
   }
 };
+

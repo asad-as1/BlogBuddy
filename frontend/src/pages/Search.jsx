@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios'; // Import axios for making HTTP requests
+import {PostCard } from '../components';
 
 const Search = () => {
   const [query, setQuery] = useState('');
@@ -34,13 +35,14 @@ const Search = () => {
       const url = `http://localhost:5000/${searchType === 'user' ? 'user' : 'post'}/search`;
 
       // Fetch data from the API
+      // console.log(url)
       const response = await axios.get(url, {
         params: {
           query: trimmedQuery
         },
         withCredentials: true // Include credentials in the request
       });
-    //   console.log(response)
+      console.log(response)
       setQuery("")
       setResults(response.data); // Store search results
       setError(''); // Clear any previous errors
@@ -125,11 +127,11 @@ const Search = () => {
           <h2 className="text-lg font-bold mb-2">Results:</h2>
           <ul className="list-disc pl-5">
             {results.map((result, index) => (
-              <li key={index} className="mb-2">
+              <div key={index} className="mb-2">
                 {searchType === 'user'
                   ? `User: ${result.username || result.fullName}`
-                  : `Post: ${result.title || result.tagName}`}
-              </li>
+                  :  <PostCard {...result} />}
+              </div>
             ))}
           </ul>
         </div>
