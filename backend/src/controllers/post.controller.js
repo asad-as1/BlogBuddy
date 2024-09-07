@@ -309,9 +309,13 @@ exports.searchPosts = async (req, res) => {
   }
 
   try {
-    // Find user IDs that match the author's name
-    const authorIds = await User.find({ name: { $regex: query, $options: 'i' } }).distinct('_id');
-
+    const authorIds = await User.find({
+      $or: [
+        { name: { $regex: query, $options: 'i' } },   // Pattern Matching: $regex matches substrings within a field. If query is "John", it will match "John", "john", "Johnny", "Johnathan", etc., in the name field.
+        { username: { $regex: query, $options: 'i' } } // Case-insensitive search for username
+      ]
+    }).distinct('_id');
+    
     // Perform search based on the query (title, categories, or author ID)
     const posts = await Post.find({
       $or: [

@@ -24,7 +24,7 @@ export default function PostForm({ post }) {
 
   const submit = async (data) => {
     try {
-      data.content = htmlToText(data.content);
+      // data.content = htmlToText(data.content);
 
       if (data.media) {
         // New media file is provided

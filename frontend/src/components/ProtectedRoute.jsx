@@ -27,7 +27,7 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
   }, [token]);
 
   if (isAuthenticated === null) {
-    return <div>Loading...</div>; // Optional: Add a loading spinner or similar
+    return <div className='text-center m-3 text-xl'>Loading...</div>; // Optional: Add a loading spinner or similar
   }
 
   return isAuthenticated ? Component : <Navigate to="/login" />;

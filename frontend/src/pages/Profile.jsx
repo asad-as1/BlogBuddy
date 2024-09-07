@@ -54,6 +54,7 @@ function Profile() {
   return (
     <Container>
       <div className="w-full py-8 min-h-screen">
+        
         <div className="max-w-md mx-auto p-6 sm:p-8 bg-white shadow-xl rounded-lg border border-gray-300">
           <div className="flex flex-col justify-between items-center sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
             {/* Profile Picture or User Icon */}
@@ -85,6 +86,7 @@ function Profile() {
               </div>
             </div>
           </div>
+          
           <div className="mt-6">
             {isOwnProfile && (
               <p className="text-gray-900 text-lg">
@@ -146,6 +148,7 @@ function Profile() {
               ))}
           </div>
         </div>
+
       </div>
     </Container>
   );
