@@ -1,20 +1,32 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import { Header, Footer } from "./components";
 import { Outlet } from "react-router-dom";
 
 function App() {
-  return(
-  <div
-    className="min-h-screen flex flex-wrap content-between bg-gradient-to-r from-blue-100 to-purple-300">
-    <div className="w-full block">
-      <Header />
-      <main>
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  return (
+    <div className={`min-h-screen flex flex-col justify-between ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <Header toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
+      <main className="flex-grow">
         <Outlet />
       </main>
       <Footer />
     </div>
-  </div>
-)}
+  );
+}
 
 export default App;

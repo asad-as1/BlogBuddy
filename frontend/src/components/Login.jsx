@@ -44,9 +44,9 @@ function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center w-full mt-12 mb-12 px-4">
+    <div className="flex text-black items-center justify-center w-full mt-12 mb-12 px-4">
       <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
-        <h2 className="text-center text-2xl font-bold leading-tight mb-4">
+        <h2 className="text-center text-black text-2xl font-bold leading-tight mb-4">
           Sign in to your account
         </h2>
         <p className="text-center text-base text-black/60 mb-4">

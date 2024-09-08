@@ -130,7 +130,7 @@ function Profile() {
 
         <hr className="border-black mt-10" />
         <div>
-          <h1 className="mt-5 text-center text-3xl sm:text-4xl font-extrabold text-blue-950">
+          <h1 className="mt-5 text-center text-3xl sm:text-4xl font-extrabold ">
             All Posts
           </h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">

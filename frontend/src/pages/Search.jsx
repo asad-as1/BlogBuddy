@@ -86,7 +86,7 @@ const Search = () => {
       </div>
 
       {/* Display the chosen search type */}
-      <div className="mb-4 text-gray-700">
+      <div className="mb-4 text-gray-600">
         {searchType
           ? `You are searching for ${
               searchType === "user" ? "users" : "posts"
@@ -100,7 +100,7 @@ const Search = () => {
           placeholder="Search"
           value={query}
           onChange={handleSearchChange}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
+          className="px-4 text-black py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-900"
           disabled={!searchType} // Disable input if no search type is selected
         />
         <button
@@ -108,7 +108,7 @@ const Search = () => {
           className={`px-4 py-2 rounded-lg text-white focus:outline-none focus:ring-2 ${
             query && searchType
               ? "bg-blue-900 hover:bg-blue-600 focus:ring-blue-500"
-              : "bg-gray-300 cursor-not-allowed"
+              : "bg-gray-600 cursor-not-allowed"
           }`}
           disabled={!query || !searchType} // Disable button if input is empty or search type is not selected
         >

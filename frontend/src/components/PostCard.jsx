@@ -102,7 +102,7 @@ function PostCard({
       {/* Post Details Section */}
       <div className="p-4">
         {/* Title */}
-        <h2 className="text-xl font-semibold mb-2">{title}</h2>
+        <h2 className="text-xl text-black font-semibold mb-2">{title}</h2>
 
         {/* Likes and Comments */}
         <div className="flex gap-4 items-center mb-2 text-gray-700">

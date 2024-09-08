@@ -86,11 +86,11 @@ function Signup({ user }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
+    <div className=" text-black flex items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
         {!user && (
           <div>
-            <h2 className="text-center text-xl sm:text-2xl font-bold leading-tight mb-4">
+            <h2 className="text-center text-black text-xl sm:text-2xl font-bold leading-tight mb-4">
               Sign up to create an account
             </h2>
             <p className="text-center text-sm sm:text-base text-black/60 mb-4">
@@ -106,7 +106,7 @@ function Signup({ user }) {
         )}
         {user && (
           <div>
-            <h2 className="text-center text-xl sm:text-2xl font-bold leading-tight mb-4">
+            <h2 className="text-center text-black text-xl sm:text-2xl font-bold leading-tight mb-4">
               Edit Your Profile
             </h2>
           </div>

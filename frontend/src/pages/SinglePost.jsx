@@ -241,7 +241,7 @@ export default function SinglePost() {
         {/* Post Details */}
         <div className="w-full mb-6">
           <h1 className="text-3xl font-bold mb-2">{post?.title}</h1>
-          <div className="w-full mb-6 text-gray-800 leading-relaxed">
+          <div className="w-full mb-6 leading-relaxed">
             {parse(post?.content || "")}
           </div>
           <p className="mb-4 flex items-center">
@@ -334,7 +334,7 @@ export default function SinglePost() {
                       ) : (
                         <FaUser className="w-6 h-7 text-gray-600" />
                       )}
-                      <span className="text-md">{user.username}</span>
+                      <span className="text-md text-black">{user.username}</span>
                     </Link>
                     <Button bgColor="bg-blue-500" className="text-sm">
                       <Link to={`/profile/${user.username}`}>View Profile</Link>
@@ -342,7 +342,7 @@ export default function SinglePost() {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500">No Likes Yet</p>
+                <p className="text-center">No Likes Yet</p>
               )}
             </div>
           </div>
@@ -369,13 +369,13 @@ export default function SinglePost() {
                       ) : (
                         <FaUser className="w-6 h-7 text-gray-500" />
                       )}
-                      <span className="font-semibold">
+                      <span className="font-semibold text-black">
                         <Link to={`/profile/${comment.user.username}`}>
                           @{comment.user.username}
                         </Link>
                       </span>
                     </div>
-                    <p className="text-gray-700 bg-gray-300 p-2 rounded-lg mb-2">
+                    <p className="text-black bg-gray-300 p-2 rounded-lg mb-2">
                       {comment.comment}
                     </p>
                     {(comment?.user?._id === loggedInUserId ||
@@ -403,7 +403,7 @@ export default function SinglePost() {
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 placeholder="Add a comment..."
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border text-black rounded-md"
                 required
               />
   

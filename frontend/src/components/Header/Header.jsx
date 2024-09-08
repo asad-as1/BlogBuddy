@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Container } from "../index";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookie from "cookies-js";
 import axios from "axios";
-import { FaBars } from "react-icons/fa";
+import { FaBars, FaSun, FaMoon } from "react-icons/fa";
+import logo from "./image/logo.jpg";
 
-function Header() {
+function Header({ toggleDarkMode, isDarkMode }) {
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState(false);
   const [user, setUser] = useState(null);
@@ -50,6 +50,20 @@ function Header() {
     }
   }, [authStatus]);
 
+  // Handle dark mode toggle and store preference in cookies
+  const handleDarkModeToggle = () => {
+    toggleDarkMode();
+    Cookie.set("darkMode", !isDarkMode);
+    // window.location.reload(); // Refresh page to apply theme change
+  };
+
+  useEffect(() => {
+    const darkModePreference = Cookie.get("darkMode");
+    if (darkModePreference === "true") {
+      toggleDarkMode(true); // Set dark mode if cookie exists
+    }
+  }, []);
+
   const handleLogout = async () => {
     try {
       await axios.post("http://localhost:5000/user/logout", {
@@ -76,77 +90,116 @@ function Header() {
 
   return (
     <header className="shadow bg-blue-950 text-white">
-      <Container>
-        <nav className="flex items-center justify-between">
-          {/* Hamburger Menu for Small Screens */}
-          <div className="relative w-full md:hidden">
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white p-3"
-            >
-              <FaBars size={28} />
-            </button>
-            {isMenuOpen && (
-              <div className="absolute top-12 w-48 bg-blue-950 rounded-lg shadow-lg z-10">
-                <ul className="p-2">
-                  {navItems.map(
-                    (item) =>
-                      item.active && (
-                        <li key={item.name} className="mb-2">
-                          <button
-                            onClick={() => {
-                              navigate(item.slug);
-                              setIsMenuOpen(false);
-                            }}
-                            className="block px-4 py-2 rounded-full hover:bg-blue-900 text-left"
-                          >
-                            {item.name}
-                          </button>
-                        </li>
-                      )
-                  )}
-                  {authStatus && (
-                    <li>
+      <div className="container mx-auto px-4">
+        <nav className="flex items-center lg:justify-around sm:justify-between max-sm:justify-between py-4">
+          {/* Logo */}
+          <img
+            src={logo}
+            className="h-12 rounded-full cursor-pointer"
+            alt="Logo"
+            onClick={() => navigate("/")}
+          />
+          <div className="flex items-center space-x-4">
+            {/* Navigation Items for Larger Screens */}
+            <ul className="hidden md:flex md:items-center space-x-4">
+              {navItems.map(
+                (item) =>
+                  item.active && (
+                    <li key={item.name}>
                       <button
-                        onClick={handleLogout}
-                        className="block px-4 py-2 rounded-full hover:bg-red-700 text-left"
+                        onClick={() => navigate(item.slug)}
+                        className="px-4 py-2 rounded-full hover:bg-blue-900 transition duration-300"
                       >
-                        Logout
+                        {item.name}
                       </button>
                     </li>
-                  )}
-                </ul>
-              </div>
-            )}
-          </div>
-          {/* Navigation Items */}
-          <ul className="hidden md:flex md:items-center md:justify-center md:h-20 md:w-full">
-            {navItems.map(
-              (item) =>
-                item.active && (
-                  <li key={item.name} className="mb-4 md:mb-0">
-                    <button
-                      onClick={() => navigate(item.slug)}
-                      className="block px-4 py-2 rounded-full hover:bg-blue-900 text-center"
-                    >
-                      {item.name}
-                    </button>
-                  </li>
-                )
-            )}
-            {authStatus && (
+                  )
+              )}
+              {authStatus && (
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 rounded-full hover:bg-red-700 transition duration-300"
+                  >
+                    Logout
+                  </button>
+                </li>
+              )}
+              {/* Dark Mode Toggle Button for Large Screens */}
               <li>
                 <button
-                  onClick={handleLogout}
-                  className="block px-4 py-2 rounded-full hover:bg-red-700 text-center"
+                  onClick={handleDarkModeToggle}
+                  className="flex items-center space-x-3 text-white p-3 rounded-full hover:bg-blue-900 transition duration-300"
                 >
-                  Logout
+                  <span>{isDarkMode ? "Light Mode" : "Dark Mode"}</span>
+                  {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
                 </button>
               </li>
-            )}
-          </ul>
+            </ul>
+
+            {/* Hamburger Menu for Small Screens */}
+            <div className="relative md:hidden">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="text-white p-2"
+              >
+                <FaBars size={28} />
+              </button>
+              {isMenuOpen && (
+                <div className="absolute top-12 right-0 w-48 bg-blue-950 rounded-lg shadow-lg z-10">
+                  <ul className="p-2">
+                    {navItems.map(
+                      (item) =>
+                        item.active && (
+                          <li key={item.name} className="mb-2">
+                            <button
+                              onClick={() => {
+                                navigate(item.slug);
+                                setIsMenuOpen(false);
+                              }}
+                              className="block px-4 py-2 rounded-full hover:bg-blue-900 text-left"
+                            >
+                              {item.name}
+                            </button>
+                          </li>
+                        )
+                    )}
+                    {authStatus && (
+                      <li>
+                        <button
+                          onClick={handleLogout}
+                          className="block px-4 py-2 rounded-full hover:bg-red-700 text-left"
+                        >
+                          Logout
+                        </button>
+                      </li>
+                    )}
+                    {/* Dark Mode Toggle Button Inside Menu */}
+                    <li
+                      onClick={() => {
+                        handleDarkModeToggle();
+                        setIsMenuOpen(false);
+                      }}
+                      className="flex items-center cursor-pointer justify-between px-4 py-2 hover:bg-blue-900 rounded-full"
+                    >
+                      <span className="flex items-center">
+                        <span className="mr-2">
+                          {isDarkMode ? "Light Mode" : "Dark Mode"}
+                        </span>
+                        {isDarkMode ? (
+                          <FaSun size={20} />
+                        ) : (
+                          <FaMoon size={20} />
+                        )}
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
         </nav>
-      </Container>
+      </div>
     </header>
   );
 }
