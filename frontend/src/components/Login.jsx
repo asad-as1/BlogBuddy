@@ -10,7 +10,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 export const login = async (data, navigate, setError) => {
   setError("");
   try {
-    const res = await axios.post(`http://localhost:5000/user/login`, data);
+    const res = await axios.post(`${import.meta.env.VITE_URL}user/login`, data);
     if (res?.status === 200) {
       const val = {
         httpOnly: true,

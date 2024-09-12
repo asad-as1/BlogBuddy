@@ -17,7 +17,7 @@ function Profile() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/user/profile/${username}`,
+          `${import.meta.env.VITE_URL}user/profile/${username}`,
           {
             withCredentials: true,
           }
@@ -40,7 +40,7 @@ function Profile() {
   // Handle account deletion
   const handleDeleteAccount = async () => {
     try {
-      await axios.delete(`http://localhost:5000/user/delete`, {
+      await axios.delete(`${import.meta.env.VITE_URL}user/delete`, {
         withCredentials: true,
       });
       Cookie.expire('token'); 

@@ -7,45 +7,60 @@ import Cookie from "cookies-js";
 
 function Home() {
   const navigate = useNavigate();
-  const [authStatus, setAuthStatus] = useState(false);
+  const [authStatus, setAuthStatus] = useState(null); // Using null to differentiate unverified vs failed
+  const [loading, setLoading] = useState(true); // Loading state to manage async data fetching
+  const [posts, setPosts] = useState([]);
+  const [user, setUser] = useState(null); // Make sure user is null initially
+  const [error, setError] = useState(null); // To capture any authentication error
   const token = Cookie.get('token');
 
+  const BACKEND_URL = import.meta.env.VITE_URL;
+
+  // Check authentication status
   useEffect(() => {
     if (token) {
-      const res = axios.get('/user/check-auth', {
+      setLoading(true); // Start loading when checking auth
+      axios.get(`${BACKEND_URL}user/check-auth`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then(response => {
-        setAuthStatus(true); // User is authenticated
-      })
-      .catch(error => {
-        setAuthStatus(false); // User is not authenticated
-        console.error('Authentication check failed', error);
-      });
+        .then(response => {
+          setAuthStatus(true); // User is authenticated
+        })
+        .catch(error => {
+          setAuthStatus(false); // User is not authenticated
+          setError('Authentication check failed. Please log in.');
+          console.error('Authentication check failed', error);
+        })
+        .finally(() => {
+          setLoading(false); // Stop loading after check
+        });
+    } else {
+      setLoading(false); // Stop loading if no token is present
     }
   }, [token]);
 
-  const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState([]);
-
+  // Fetch posts only if the user is authenticated
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get('http://localhost:5000/post/allPosts');
-        setPosts(res.data);
-      } catch (error) {
-        console.error('Request failed', error);
-      }
-    };
+    if (authStatus) {
+      const fetchPosts = async () => {
+        try {
+          const res = await axios.get(`${BACKEND_URL}post/allPosts`);
+          setPosts(res.data);
+        } catch (error) {
+          console.error('Request failed', error);
+        }
+      };
+      fetchPosts(); 
+    }
+  }, [authStatus]);
 
-    fetchData(); 
-  }, []); 
-
-  if(token) {
-    useEffect(() => {
+  // Fetch user data if authenticated
+  useEffect(() => {
+    if (authStatus) {
       const fetchUserData = async () => {
         try {
-          const res = await axios.get("http://localhost:5000/user/profile", {
+          const res = await axios.get(`${BACKEND_URL}user/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
           });
           setUser(res?.data?.user);
@@ -54,9 +69,33 @@ function Home() {
         }
       };
       fetchUserData();
-    }, []);
+    }
+  }, [authStatus, token]);
+
+  // Loading state
+  if (loading) {
+    return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
   }
 
+  // Display error message if any
+  if (error) {
+    return (
+      <div className="w-full py-8 mt-4 text-center">
+        <Container>
+          <div className="flex flex-wrap items-center justify-center h-80 mt-4 mb-3">
+            <div className="p-2 w-full">
+              <h1 className="text-2xl font-bold text-red-500">
+                {error}
+              </h1>
+              <Button children={"Log In"} onClick={() => { navigate("/login"); }} />
+            </div>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  // Render a button if no posts exist
   if (authStatus && posts.length === 0) {
     return (
       <div className="w-full py-8 mt-4 text-center">
@@ -73,40 +112,20 @@ function Home() {
     );
   }
 
-  if (!authStatus) {
-    return (
-      <div className="w-full py-8 mt-4 text-center">
-        <Container>
-          <div className="flex flex-wrap items-center justify-center h-80 mt-4 mb-3">
-            <div className="p-2 w-full">
-              <h1 className="text-2xl font-bold hover:text-gray-500">
-                <Button children={"Log In to See Posts"} onClick={() => { navigate("/login"); }} />
-              </h1>
-            </div>
-          </div>
-        </Container>
-      </div>
-    );
-  }
-
+  // Main posts rendering logic based on user role
   return (
     <div className='w-full py-8'>
       <Container>
         <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
           {posts.map((post) => (
-            (user.role === "admin" ? ( // Only render if post is public
+            (user?.role === "admin" || post.isPublished === "Public") && (  // Admin can see all posts, others only public
               <div key={post._id} className='p-2'>
                 <PostCard {...post} />
-                {(post.isPublished !== "Public") && (
+                {user?.role === "admin" && post.isPublished !== "Public" && (  // Show "Private Post" for admin
                   <h2 className='text-center text-xl mt-1'>Private Post</h2>
                 )}
               </div>
-            ):
-            (post.isPublished === "Public") && ( // Only render if post is public
-              <div key={post._id} className='p-2'>
-                <PostCard {...post} />
-              </div>
-            ))
+            )
           ))}
         </div>
       </Container>

@@ -8,7 +8,7 @@ function LogoutBtn({ setAuthStatus }) {
 
   const logoutHandler = async () => {
     try {
-      await axios.post(`http://localhost:5000/user/logout`, {
+      await axios.post(`${import.meta.env.VITE_URL}user/logout`, {
         withCredentials: true, // Include cookies in the request
     });
       Cookie.expire('token'); // Remove the token cookie

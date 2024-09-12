@@ -36,7 +36,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
     if (authStatus) {
       const fetchUserData = async () => {
         try {
-          const res = await axios.get("http://localhost:5000/user/profile", {
+          const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
             withCredentials: true,
           });
           setUser(res.data.user);
@@ -66,7 +66,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:5000/user/logout", {
+      await axios.post(`${import.meta.env.VITE_URL}user/logout`, {
         withCredentials: true,
       });
       Cookie.expire("token");

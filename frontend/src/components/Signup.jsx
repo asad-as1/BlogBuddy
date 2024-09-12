@@ -53,14 +53,14 @@ function Signup({ user }) {
 
       let res;
       if (user) {
-        res = await axios.put(`http://localhost:5000/user/profile`, data, {
+        res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data, {
           withCredentials: true,
         });
         if (res?.status === 200) {
           alert("Profile Updated Successfully");
         }
       } else {
-        res = await axios.post(`http://localhost:5000/user/register`, data);
+        res = await axios.post(`${import.meta.env.VITE_URL}user/register`, data);
         if (res?.status === 201) {
           alert("Successfully Registered");
           login(data, navigate, setError);

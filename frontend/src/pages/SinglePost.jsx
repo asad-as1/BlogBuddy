@@ -23,7 +23,7 @@ export default function SinglePost() {
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/post/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}`);
         setPost(res?.data);
         setIsLiked(res?.data?.likes?.includes(loggedInUserId));
         setLikeCount(res?.data?.likes?.length || 0);
@@ -34,7 +34,7 @@ export default function SinglePost() {
 
     const fetchUserData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/user/profile", {
+        const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
           withCredentials: true,
         });
         setLoggedInUserId(res?.data?.user?._id);
@@ -78,8 +78,8 @@ export default function SinglePost() {
 
     try {
       const endpoint = isLiked
-        ? `http://localhost:5000/post/${id}/unlike`
-        : `http://localhost:5000/post/${id}/like`;
+        ? `${import.meta.env.VITE_URL}post/${id}/unlike`
+        : `${import.meta.env.VITE_URL}post/${id}/like`;
 
       const res = await axios.post(endpoint, {}, { withCredentials: true });
 
@@ -95,7 +95,7 @@ export default function SinglePost() {
 
   const fetchLikesList = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/post/${id}/likes`);
+      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/likes`);
       setLikesList(res?.data?.likes);
       // console.log(res.data.likes)
     } catch (error) {
@@ -105,7 +105,7 @@ export default function SinglePost() {
 
   const fetchCommentsList = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/post/${id}/comments`);
+      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/comments`);
       setCommentsList(res?.data?.comments);
     } catch (error) {
       console.error("Failed to fetch comments list:", error);
@@ -122,7 +122,7 @@ export default function SinglePost() {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/post/${id}/comment`,
+        `${import.meta.env.VITE_URL}post/${id}/comment`,
         { comment: trimmedComment },
         { withCredentials: true }
       );
@@ -137,7 +137,7 @@ export default function SinglePost() {
   const addPostToFavorites = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/user/favourites/${post?._id}`,
+        `${import.meta.env.VITE_URL}user/favourites/${post?._id}`,
         { withCredentials: true }
       );
       // console.log(res)
@@ -153,7 +153,7 @@ export default function SinglePost() {
   const RemoveFromFavorites = async (e) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/user/removeFavourites/${post?._id}`,
+       `${import.meta.env.VITE_URL}user/removeFavourites/${post?._id}`,
         { withCredentials: true }
       );
       if (res.status == 200) {
@@ -168,7 +168,7 @@ export default function SinglePost() {
   const checkIfPostIsFavorite = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/user/favourites/check/${id}`,
+        `${import.meta.env.VITE_URL}user/favourites/check/${id}`,
         { withCredentials: true }
       );
       // console.log(res)
@@ -180,7 +180,7 @@ export default function SinglePost() {
 
   const deletePost = async () => {
     try {
-      await axios.delete(`http://localhost:5000/post/${id}`, {
+      await axios.delete(`${import.meta.env.VITE_URL}post/${id}`, {
         withCredentials: true,
       });
       navigate("/");
@@ -192,7 +192,7 @@ export default function SinglePost() {
   const handleDeleteComment = async (commentId) => {
     try {
       const res = await axios.delete(
-        `http://localhost:5000/post/${id}/comment/${commentId}`,
+       `${import.meta.env.VITE_URL}post/${id}/comment/${commentId}`,
         {
           withCredentials: true,
         }

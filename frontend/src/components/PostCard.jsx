@@ -28,14 +28,14 @@ function PostCard({
     if (token) {
       const fetchUserProfile = async () => {
         try {
-          const res = await axios.get("http://localhost:5000/user/profile", {
+          const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
             withCredentials: true,
           });
           const currentUserId = res.data.user._id;
           setUserId(currentUserId);
           setIsLiked(likes.includes(currentUserId));
           const authordata = await axios.post(
-            "http://localhost:5000/user/getUserById",
+            `${import.meta.env.VITE_URL}user/getUserById`,
             { author },
             { withCredentials: true }
           );
@@ -54,8 +54,8 @@ function PostCard({
 
     try {
       const endpoint = isLiked
-        ? `http://localhost:5000/post/${_id}/unlike`
-        : `http://localhost:5000/post/${_id}/like`;
+        ? `${import.meta.env.VITE_URL}post/${_id}/unlike`
+        : `${import.meta.env.VITE_URL}post/${_id}/like`;
 
       const res = await axios.post(endpoint, {}, { withCredentials: true });
 

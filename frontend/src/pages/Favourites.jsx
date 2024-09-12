@@ -8,7 +8,7 @@ const Favourites = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/user/favourites", {
+        const res = await axios.get(`${import.meta.env.VITE_URL}user/favourites`, {
           withCredentials: true,
         });
         setPosts(res.data.favourites);

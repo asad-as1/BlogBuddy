@@ -53,11 +53,11 @@ export default function PostForm({ post }) {
       }
 
       if (post) {
-        await axios.put(`http://localhost:5000/post/${post._id}`, data, {
+        await axios.put(`${import.meta.env.VITE_URL}post/${post._id}`, data, {
           withCredentials: true,
         });
       } else {
-        await axios.post("http://localhost:5000/post/newPost", data, {
+        await axios.post(`${import.meta.env.VITE_URL}post/newPost`, data, {
           withCredentials: true,
         });
       }

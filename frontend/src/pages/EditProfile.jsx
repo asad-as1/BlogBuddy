@@ -9,7 +9,7 @@ const EditProfile = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/user/profile", {
+        const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
           withCredentials: true,
         });
         setUser(res?.data?.user);
