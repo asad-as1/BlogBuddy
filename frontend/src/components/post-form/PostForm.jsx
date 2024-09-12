@@ -4,10 +4,10 @@ import { Button, Input, RTE, Select } from "..";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { upload } from "../../firebase";
-import { htmlToText } from 'html-to-text';  
+import { htmlToText } from 'html-to-text';
 
 export default function PostForm({ post }) {
-  const { register, handleSubmit, setValue, control, getValues } = useForm({
+  const { register, handleSubmit, setValue, control, getValues, formState: { errors }, setError } = useForm({
     defaultValues: {
       title: post?.title || "",
       categories: post?.categories || "",
@@ -20,52 +20,58 @@ export default function PostForm({ post }) {
   const [isVideo, setIsVideo] = useState(post?.media?.isVideo || false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTime, setUploadTime] = useState(null);
+  const [fileError, setFileError] = useState(""); // File input error
   const navigate = useNavigate();
 
   const submit = async (data) => {
-    try {
-      // data.content = htmlToText(data.content);
+    if (!data.media && !post?.media) {
+      setFileError("Featured media is required");
+      return;
+    }
 
+    if (!data.content) {
+      setError("content", { type: "required", message: "Content is required" });
+      return;
+    }
+
+    try {
       if (data.media) {
-        // New media file is provided
         const startTime = Date.now();
         const url = await upload(data.media, (progress) => {
           setUploadProgress(progress);
         });
         const endTime = Date.now();
-        const timeTaken = ((endTime - startTime) / 1000).toFixed(2); // in seconds
-  
+        const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
+
         data.media = {
           url: url,
           isVideo: isVideo,
         };
         setUploadTime(timeTaken);
       } else if (post) {
-        // No new media file, preserve existing media
         data.media = post.media;
       }
-  
+
       if (post) {
-        // Update existing post
         await axios.put(`http://localhost:5000/post/${post._id}`, data, {
           withCredentials: true,
         });
       } else {
-        // Create new post
         await axios.post("http://localhost:5000/post/newPost", data, {
           withCredentials: true,
         });
       }
-  
+
       navigate("/");
     } catch (error) {
       console.error("Error submitting post:", error);
     }
   };
-  
+
   const handleMediaChange = (e) => {
     const file = e.target.files[0];
-    
+    setFileError(""); // Reset file error when new file is selected
+
     if (file) {
       const fileType = file.type.split("/")[0];
       setIsVideo(fileType === "video");
@@ -76,13 +82,31 @@ export default function PostForm({ post }) {
       };
       reader.readAsDataURL(file);
 
-      setValue("media", file); // Set the new media file
-      setUploadProgress(0);
-      setUploadTime(null);
+      // Handle video duration check if the file is a video
+      if (fileType === "video") {
+        const videoElement = document.createElement("video");
+        videoElement.src = URL.createObjectURL(file);
+        videoElement.onloadedmetadata = () => {
+          if (videoElement.duration > 60) {
+            setFileError("Video duration should not exceed 60 seconds.");
+            setMediaPreview("");
+            setValue("media", null);
+            setIsVideo(false);
+          } else {
+            setValue("media", file);
+            setUploadProgress(0);
+            setUploadTime(null);
+          }
+        };
+      } else {
+        setValue("media", file);
+        setUploadProgress(0);
+        setUploadTime(null);
+      }
     } else {
       setMediaPreview("");
       setIsVideo(false);
-      setValue("media", null); // Clear the media file
+      setValue("media", null);
     }
   };
 
@@ -92,17 +116,29 @@ export default function PostForm({ post }) {
         <Input
           label="Title :"
           placeholder="Title"
-          className="mb-4"
-          {...register("title", { required: true })}
+          className="mb-1"
+          {...register("title", { required: "Title is required" })}
         />
+        {errors.title && <p className="text-red-500">{errors.title.message}</p>}
+        
         <Input
           label="Categories :"
           placeholder="Categories"
-          className="mb-4"
-          {...register("categories", { required: true })}
+          className="mb-1"
+          {...register("categories", { required: "Categories are required" })}
         />
-        <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
+        {errors.categories && <p className="text-red-500">{errors.categories.message}</p>}
+
+        <RTE
+          label="Content :"
+          name="content"
+          control={control}
+          defaultValue={getValues("content")}
+          rules={{ required: "Content is required" }}
+        />
+        {errors.content && <p className="text-red-500">{errors.content.message}</p>}
       </div>
+
       <div className="w-full sm:w-1/3 px-2">
         <Input
           label="Featured Media :"
@@ -111,6 +147,7 @@ export default function PostForm({ post }) {
           accept="image/*,video/*"
           onChange={handleMediaChange}
         />
+        {fileError && <p className="text-red-500">{fileError}</p>}
         {mediaPreview && (
           <div className="w-full mb-4">
             {isVideo ? (
@@ -119,11 +156,7 @@ export default function PostForm({ post }) {
                 Your browser does not support the video tag.
               </video>
             ) : (
-              <img
-                src={mediaPreview}
-                alt="Featured"
-                className="w-full rounded-lg"
-              />
+              <img src={mediaPreview} alt="Featured" className="w-full rounded-lg" />
             )}
           </div>
         )}
@@ -133,12 +166,13 @@ export default function PostForm({ post }) {
             {uploadTime && <p>Time taken: {uploadTime} seconds</p>}
           </div>
         )}
+
         <Select
           options={["Public", "Private"]}
           label="Status"
           className="mb-4"
-          {...register("isPublished", { required: true })}
-        />
+          {...register("isPublished", { required: "Status is required" })}
+        />        
         <Button type="submit" bgColor={post ? "bg-green-500" : undefined} className="w-full">
           {post ? "Update" : "Submit"}
         </Button>

@@ -104,7 +104,7 @@ function PostCard({
         {/* Title */}
         <h2 className="text-xl text-black font-semibold mb-2">{title}</h2>
 
-        {/* Likes and Comments */}
+        {/* Likes */}
         <div className="flex gap-4 items-center mb-2 text-gray-700">
           <button className="flex items-center">
             <FaHeart
@@ -113,10 +113,6 @@ function PostCard({
               size={20}
             />
             <span>{likeCount}</span>
-          </button>
-          <button className="flex items-center">
-            <FaComment className="text-gray-400 mr-2" size={20} />
-            <span>{comments.length}</span>
           </button>
         </div>
 
