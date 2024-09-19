@@ -11,7 +11,7 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
     const checkAuth = async () => {
       try {
         // const response = await axios.get('/user/check-auth', {
-        const response = await axios.get(`user/check-auth`, {
+        const response = await axios.get(`${import.meta.env.VITE_URL}user/check-auth`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setIsAuthenticated(response.status === 200);
