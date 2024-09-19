@@ -7,12 +7,15 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const token = Cookie.get('token');
 
+  const BACKEND_URL = import.meta.env.VITE_URL;
+
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // const response = await axios.get('/user/check-auth', {
-        const response = await axios.get(`/`, {
-          headers: { Authorization: `Bearer ${token}` }
+        const response = await axios.get(`${BACKEND_URL}user/check-auth`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true // Add this line
         });
         setIsAuthenticated(response.status === 200);
       } catch (error) {
