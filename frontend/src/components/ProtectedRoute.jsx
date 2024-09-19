@@ -10,7 +10,8 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/user/check-auth', {
+        // const response = await axios.get('/user/check-auth', {
+        const response = await axios.get(`user/check-auth`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setIsAuthenticated(response.status === 200);

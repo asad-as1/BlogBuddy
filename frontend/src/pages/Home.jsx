@@ -18,26 +18,29 @@ function Home() {
 
   // Check authentication status
   useEffect(() => {
-    if (token) {
-      setLoading(true); // Start loading when checking auth
-      axios.get(`${BACKEND_URL}user/check-auth`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then(response => {
+    const checkAuth = async () => {
+      if (token) {
+        setLoading(true); // Start loading when checking auth
+        try {
+          const response = await axios.get(`${BACKEND_URL}user/check-auth`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
           setAuthStatus(true); // User is authenticated
-        })
-        .catch(error => {
+          setLoading(false); // Stop loading after success
+        } catch (error) {
           setAuthStatus(false); // User is not authenticated
           setError('Authentication check failed. Please log in.');
           console.error('Authentication check failed', error);
-        })
-        .finally(() => {
-          setLoading(false); // Stop loading after check
-        });
-    } else {
-      setLoading(false); // Stop loading if no token is present
-    }
+          setLoading(false); // Stop loading after failure
+        }
+      } else {
+        setLoading(false); // Stop loading if no token is present
+      }
+    };
+  
+    checkAuth();
   }, [token]);
+  
 
   // Fetch posts only if the user is authenticated
   useEffect(() => {
