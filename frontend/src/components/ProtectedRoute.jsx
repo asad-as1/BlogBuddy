@@ -12,9 +12,9 @@ const ProtectedRoute = ({ element: Component, ...rest }) => {
     checkAuthentication();
   }, []);
 
-  if (isAuthenticated === null) {
-    return <div className="text-center m-3 text-xl">Loading...</div>; 
-  }
+  // if (isAuthenticated === null) {
+  //   return <div className="text-center m-3 text-xl">Loading...</div>; 
+  // }
 
   return isAuthenticated ? (
     <Component {...rest} isAuthenticated={isAuthenticated} />
