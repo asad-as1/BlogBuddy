@@ -7,12 +7,14 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
 
 dotenv.config();
+console.log(process.env.CORS_ORIGIN);
 
 // Middleware setup
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
-  credentials: true
+  credentials: true,
 }));
+
 app.use(express.json()); 
 app.use(bodyParser.json()); 
 app.use(express.urlencoded({ extended: true })); 

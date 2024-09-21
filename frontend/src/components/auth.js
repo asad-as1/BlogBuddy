@@ -1,5 +1,5 @@
 import Cookies from 'js-cookie';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 export const isTokenValid = () => {
   const token = Cookies.get('token');
@@ -9,11 +9,11 @@ export const isTokenValid = () => {
   }
 
   try {
-    const decoded = jwtDecode(token);
-    const currentTime = Date.now() / 1000; 
+    const decoded = jwtDecode (token);
+    const currentTime = Date.now() / 1000;
 
     if (decoded.exp < currentTime) {
-      Cookies.remove('token'); 
+      Cookies.remove('token');
       return false;
     }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, PostCard } from '../components';
+import { Container, PostCard, Login } from '../components';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Button } from '../components/index';
@@ -54,21 +54,9 @@ function Home() {
     return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
   }
 
- 
   if (error) {
     return (
-      <div className="w-full py-8 mt-4 text-center">
-        <Container>
-          <div className="flex flex-wrap items-center justify-center h-80 mt-4 mb-3">
-            <div className="p-2 w-full">
-              <h1 className="text-2xl font-bold text-red-500">
-                {error}
-              </h1>
-              <Button children={"Log In"} onClick={() => { navigate("/login"); }} />
-            </div>
-          </div>
-        </Container>
-      </div>
+      <Login/>
     );
   }
 
