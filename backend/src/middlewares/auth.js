@@ -6,7 +6,7 @@ const User = require('../models/user'); // Adjust the path to your User model
 const authenticate = async (req, res, next) => {
   const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
   if (!token) {
-    return res.status(401).json({ message: 'Unauthorized' });
+    return res.status(401).json({ message: 'Unauthorized1' });
   }
   
   try {
@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
     // console.log(req.user)
     // console.log(await User.findById(decoded.userId))
     if (!req.user) {
-      return res.status(401).json({ message: 'Unauthorized' });
+      return res.status(401).json({ message: 'Unauthorized2' });
     }
     next();
   } catch (error) {
