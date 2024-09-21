@@ -8,7 +8,7 @@ exports.createPost = async (req, res) => {
     const user = req.user;
 
     const newPost = new Post({
-      author: user._id,
+      author: user.id,
       title,
       content,
       media: {
@@ -21,7 +21,7 @@ exports.createPost = async (req, res) => {
 
     const savedPost = await newPost.save();
 
-    await User.findByIdAndUpdate(user._id, {
+    await User.findByIdAndUpdate(user.id, {
       $push: { posts: savedPost._id },
     });
 
@@ -96,7 +96,7 @@ exports.updatePost = async (req, res) => {
 exports.deletePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const post = await Post.findById(postId);
     if (!post) {
@@ -141,7 +141,7 @@ exports.deletePost = async (req, res) => {
 exports.likePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const post = await Post.findById(postId);
 
@@ -166,7 +166,7 @@ exports.likePost = async (req, res) => {
 exports.unlikePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const post = await Post.findById(postId);
 
@@ -193,7 +193,7 @@ exports.addComment = async (req, res) => {
     const postId = req.params.postId;
     // console.log(req.body)
     const { comment } = req.body;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     const post = await Post.findById(postId);
 
@@ -220,7 +220,7 @@ exports.deleteComment = async (req, res) => {
     // console.log(req.user.role)
     const postId = req.params.postId;
     const commentId = req.params.commentId;
-    const userId = req.user._id;
+    const userId = req.user.id;
 
     // Find the post by ID
     const post = await Post.findById(postId);

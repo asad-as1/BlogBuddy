@@ -73,8 +73,9 @@ exports.logout = (req, res) => {
 
 // Get user profile
 exports.getProfile = async (req, res) => {
+  console.log(req.user);
   try {
-    const user = await User.findById(req.user._id).select('-password').populate('posts'); // Exclude the password field
+    const user = await User.findById(req.user.id).select('-password').populate('posts'); // Exclude the password field
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
@@ -140,7 +141,7 @@ exports.updateProfile = async (req, res) => {
 // Delete a user account and associated data
 exports.deleteUser = async (req, res) => {
   try {
-    const userId = req.user._id.toString();
+    const userId = req.user.id.toString();
     // console.log(userId)
     const deletedUser = await User.findByIdAndDelete(userId);
 
@@ -249,7 +250,7 @@ exports.isPostInFavourites = async (req, res) => {
 
 // Fetch the list of on a user
 exports.fetchFavourites = async (req, res) => {
-  const userId = req.user._id; 
+  const userId = req.user.id; 
   
   try {
     const user = await User.findById(userId).populate('favourites');

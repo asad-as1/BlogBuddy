@@ -18,6 +18,7 @@ function Home() {
 
 
   const isAuthenticated = isTokenValid();
+  // console.log(isAuthenticated)
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -50,7 +51,7 @@ function Home() {
       setLoading(false); 
       navigate('/login');
     }
-  }, [isAuthenticated, token, navigate]);
+  }, [isAuthenticated, token]);
 
  
   // if (loading) {

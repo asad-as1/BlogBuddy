@@ -19,7 +19,7 @@ const authenticate = async (req, res, next) => {
     }
 
     // Only attach the username to the request object
-    req.user = { username: user.username };
+    req.user = { username: user.username, id: user._id, role: user.role };
 
     next();
   } catch (error) {
