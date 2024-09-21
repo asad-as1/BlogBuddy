@@ -16,7 +16,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
     const checkAuth = async () => {
       if (token) {
         try {
-          await axios.get("/user/check-auth", {
+          await axios.get(`${import.meta.env.VITE_URL}user/check-auth`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setAuthStatus(true);
