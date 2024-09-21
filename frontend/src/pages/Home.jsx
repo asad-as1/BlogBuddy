@@ -24,6 +24,7 @@ function Home() {
       const fetchPosts = async () => {
         try {
           const res = await axios.get(`${BACKEND_URL}post/allPosts`);
+          // console.log(res, "post")
           setPosts(res.data);
         } catch (error) {
           console.error('Request failed', error);
@@ -37,28 +38,30 @@ function Home() {
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
           });
+          // console.log(res, "user")
           setUser(res?.data?.user);
         } catch (error) {
           console.error("Failed to fetch user data:", error);
         }
       };
       fetchUserData();
-    } else {
+    } 
+    else {
       setLoading(false); 
       navigate('/login');
     }
   }, [isAuthenticated, token, navigate]);
 
  
-  if (loading) {
-    return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
+  // }
 
-  if (error) {
-    return (
-      <Login/>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <Login/>
+  //   );
+  // }
 
   if (posts.length === 0) {
     return (

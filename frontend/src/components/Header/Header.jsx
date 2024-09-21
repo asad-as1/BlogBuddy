@@ -16,9 +16,11 @@ function Header({ toggleDarkMode, isDarkMode }) {
     const checkAuth = async () => {
       if (token) {
         try {
-          await axios.get(`${import.meta.env.VITE_URL}user/check-auth`, {
+          const res = await axios.get(`${import.meta.env.VITE_URL}user/check-auth`, {
             headers: { Authorization: `Bearer ${token}` },
           });
+          console.log(res, "check auth header");
+          setUser(res.data.user);
           setAuthStatus(true);
         } catch (error) {
           setAuthStatus(false);
@@ -32,23 +34,24 @@ function Header({ toggleDarkMode, isDarkMode }) {
     checkAuth();
   }, [token]);
 
-  useEffect(() => {
-    if (authStatus) {
-      const fetchUserData = async () => {
-        try {
-          const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
-            withCredentials: true,
-          });
-          setUser(res.data.user);
-        } catch (error) {
-          console.error("Failed to fetch user data:", error);
-        }
-      };
-      fetchUserData();
-    } else {
-      setUser(null);
-    }
-  }, [authStatus]);
+  // useEffect(() => {
+  //   if (authStatus) {
+  //     const fetchUserData = async () => {
+  //       try {
+  //         const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
+  //           withCredentials: true,
+  //         });
+  //         setUser(res.data.user);
+  //       } catch (error) {
+  //         console.error("Failed to fetch user data:", error);
+  //       }
+  //     };
+  //     fetchUserData();
+  //   } else {
+  //     setUser(null);
+  //   }
+  // }, [authStatus]);
+
 
   // Handle dark mode toggle and store preference in cookies
   const handleDarkModeToggle = () => {
