@@ -1,9 +1,6 @@
-const express = require('express');
-const router = express.Router();
+// controllers/authController.js
 const isAuthenticated = require('../middlewares/auth');
 
-router.get('/user/check-auth', isAuthenticated, (req, res) => {
+exports.checkAuth = (req, res) => {
   res.status(200).json({ message: 'Authenticated', user: req.user });
-});
-
-module.exports = router;
+};
