@@ -4,47 +4,23 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Button } from '../components/index';
 import Cookie from "cookies-js";
+import { isTokenValid } from '../components/auth';
 
 function Home() {
   const navigate = useNavigate();
-  const [authStatus, setAuthStatus] = useState(null); // Using null to differentiate unverified vs failed
-  const [loading, setLoading] = useState(true); // Loading state to manage async data fetching
+  const [loading, setLoading] = useState(true); 
   const [posts, setPosts] = useState([]);
-  const [user, setUser] = useState(null); // Make sure user is null initially
-  const [error, setError] = useState(null); // To capture any authentication error
+  const [user, setUser] = useState(null); 
+  const [error, setError] = useState(null); 
   const token = Cookie.get('token');
 
   const BACKEND_URL = import.meta.env.VITE_URL;
 
-  // Check authentication status
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (token) {
-        setLoading(true); // Start loading when checking auth
-        try {
-          const response = await axios.get(`${BACKEND_URL}user/check-auth`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          setAuthStatus(true); // User is authenticated
-          setLoading(false); // Stop loading after success
-        } catch (error) {
-          setAuthStatus(false); // User is not authenticated
-          setError('Authentication check failed. Please log in.');
-          console.error('Authentication check failed', error);
-          setLoading(false); // Stop loading after failure
-        }
-      } else {
-        setLoading(false); // Stop loading if no token is present
-      }
-    };
-  
-    checkAuth();
-  }, [token]);
-  
 
-  // Fetch posts only if the user is authenticated
+  const isAuthenticated = isTokenValid();
+
   useEffect(() => {
-    if (authStatus) {
+    if (isAuthenticated) {
       const fetchPosts = async () => {
         try {
           const res = await axios.get(`${BACKEND_URL}post/allPosts`);
@@ -53,13 +29,8 @@ function Home() {
           console.error('Request failed', error);
         }
       };
-      fetchPosts(); 
-    }
-  }, [authStatus]);
+      fetchPosts();
 
-  // Fetch user data if authenticated
-  useEffect(() => {
-    if (authStatus) {
       const fetchUserData = async () => {
         try {
           const res = await axios.get(`${BACKEND_URL}user/profile`, {
@@ -72,15 +43,18 @@ function Home() {
         }
       };
       fetchUserData();
+    } else {
+      setLoading(false); 
+      navigate('/login');
     }
-  }, [authStatus, token]);
+  }, [isAuthenticated, token, navigate]);
 
-  // Loading state
+ 
   if (loading) {
     return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
   }
 
-  // Display error message if any
+ 
   if (error) {
     return (
       <div className="w-full py-8 mt-4 text-center">
@@ -98,8 +72,7 @@ function Home() {
     );
   }
 
-  // Render a button if no posts exist
-  if (authStatus && posts.length === 0) {
+  if (posts.length === 0) {
     return (
       <div className="w-full py-8 mt-4 text-center">
         <Container>
@@ -115,7 +88,7 @@ function Home() {
     );
   }
 
-  // Main posts rendering logic based on user role
+  
   return (
     <div className='w-full py-8'>
       <Container>
