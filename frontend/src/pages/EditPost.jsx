@@ -13,7 +13,10 @@ function EditPost() {
     useEffect(() => {
         const fetchPostData = async () => {
             try {
-              const res = await axios.get(`${import.meta.env.VITE_URL}post/${postId}`);
+              const res = await axios.get(`${import.meta.env.VITE_URL}post/${postId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
+              });
               setPost(res?.data);
             } catch (error) {
               console.error("Request failed", error);

@@ -17,8 +17,8 @@ function Profile() {
     const fetchUserData = async () => {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_URL}user/profile/${username}`,
-          {
+          `${import.meta.env.VITE_URL}user/profile/${username}`, {
+            headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
           }
         );
@@ -41,6 +41,7 @@ function Profile() {
   const handleDeleteAccount = async () => {
     try {
       await axios.delete(`${import.meta.env.VITE_URL}user/delete`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       Cookie.expire('token'); 

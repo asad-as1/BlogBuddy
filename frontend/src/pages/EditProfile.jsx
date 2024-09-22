@@ -10,6 +10,7 @@ const EditProfile = () => {
     const fetchUserData = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         setUser(res?.data?.user);

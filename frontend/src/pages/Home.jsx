@@ -49,8 +49,12 @@ function Home() {
     if (authStatus) {
       const fetchPosts = async () => {
         try {
-          const res = await axios.get(`${BACKEND_URL}post/allPosts`);
+          const res = await axios.get(`${BACKEND_URL}post/allPosts`, {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          });
           setPosts(res.data);
+          // console.log(res.data)
           setUser(res?.data?.user);
         } catch (error) {
           console.error('Request failed', error);
@@ -60,23 +64,6 @@ function Home() {
     }
   }, [authStatus]);
 
-  
-  // useEffect(() => {
-  //   if (authStatus) {
-  //     const fetchUserData = async () => {
-  //       try {
-  //         const res = await axios.get(`${BACKEND_URL}user/profile`, {
-  //           headers: { Authorization: `Bearer ${token}` },
-  //           withCredentials: true,
-  //         });
-  //         setUser(res?.data?.user);
-  //       } catch (error) {
-  //         console.error("Failed to fetch user data:", error);
-  //       }
-  //     };
-  //     fetchUserData();
-  //   }
-  // }, [authStatus, token]);
 
   // Loading state
   if (loading) {

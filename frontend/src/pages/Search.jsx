@@ -46,6 +46,7 @@ const Search = () => {
         params: {
           query: trimmedQuery,
         },
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true, // Include credentials in the request
       });
 

@@ -9,6 +9,7 @@ const Favourites = () => {
     const fetchData = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_URL}user/favourites`, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         setPosts(res.data.favourites);

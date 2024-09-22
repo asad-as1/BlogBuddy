@@ -54,10 +54,12 @@ export default function PostForm({ post }) {
 
       if (post) {
         await axios.put(`${import.meta.env.VITE_URL}post/${post._id}`, data, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
       } else {
         await axios.post(`${import.meta.env.VITE_URL}post/newPost`, data, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
       }
