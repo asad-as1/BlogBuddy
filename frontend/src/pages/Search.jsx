@@ -3,8 +3,10 @@ import axios from "axios"; // Import axios for making HTTP requests
 import { PostCard, Container } from "../components";
 import { FaUserCircle } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Cookie from "cookies-js";
 
 const Search = () => {
+  const token = Cookie.get("token");
   const [query, setQuery] = useState("");
   const [searchType, setSearchType] = useState(""); // To track whether searching for 'user' or 'post'
   const [hasSubmitted, setHasSubmitted] = useState(false);

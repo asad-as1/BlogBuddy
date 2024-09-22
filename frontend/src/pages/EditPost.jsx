@@ -2,8 +2,10 @@ import React, {useEffect, useState} from 'react'
 import {Container, PostForm} from '../components'
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
+import Cookie from "cookies-js";
 
 function EditPost() {
+    const token = Cookie.get("token");
     const location = useLocation();
     const pathname = location.pathname;
     const postId = pathname.split('/')[2];

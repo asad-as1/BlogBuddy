@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Button, Input, RTE, Select } from "..";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookie from "cookies-js";
 import { upload } from "../../firebase";
 import { htmlToText } from 'html-to-text';
 
@@ -15,7 +16,7 @@ export default function PostForm({ post }) {
       isPublished: post?.isPublished || "Public",
     },
   });
-
+  const token = Cookie.get("token");
   const [mediaPreview, setMediaPreview] = useState(post?.media?.url || "");
   const [isVideo, setIsVideo] = useState(post?.media?.isVideo || false);
   const [uploadProgress, setUploadProgress] = useState(0);

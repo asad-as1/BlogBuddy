@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Container, PostCard } from "../components";
 import axios from "axios";
+import Cookie from "cookies-js";
 
 const Favourites = () => {
   const [posts, setPosts] = useState([]);
+  const token = Cookie.get("token");
 
   useEffect(() => {
     const fetchData = async () => {

@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button, Container } from "../components";
 import parse from "html-react-parser";
 import axios from "axios";
+import Cookie from "cookies-js";
 import { FaHeart, FaComment, FaUser, FaShareAlt } from "react-icons/fa";
 
 export default function SinglePost() {
+  const token = Cookie.get("token");
   const location = window.location.href.split("/");
   const id = location[4];
   const navigate = useNavigate();
@@ -23,7 +25,11 @@ export default function SinglePost() {
   useEffect(() => {
     const fetchPostData = async () => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}`);
+        const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            withCredentials: true,
+          }
+        );
         setPost(res?.data);
         setIsLiked(res?.data?.likes?.includes(loggedInUserId));
         setLikeCount(res?.data?.likes?.length || 0);
@@ -35,6 +41,7 @@ export default function SinglePost() {
     const fetchUserData = async () => {
       try {
         const res = await axios.get(`${import.meta.env.VITE_URL}user/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         setLoggedInUserId(res?.data?.user?._id);
@@ -60,7 +67,7 @@ export default function SinglePost() {
       navigator
         .share(shareData)
         .then(() => {
-          console.log("Post shared successfully!");
+          alert("Post shared successfully!");
         })
         .catch((error) => {
           console.error("Error sharing post:", error);
@@ -81,7 +88,10 @@ export default function SinglePost() {
         ? `${import.meta.env.VITE_URL}post/${id}/unlike`
         : `${import.meta.env.VITE_URL}post/${id}/like`;
 
-      const res = await axios.post(endpoint, {}, { withCredentials: true });
+      const res = await axios.post(endpoint, {}, { 
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
 
       if (res.status === 200) {
         setIsLiked(!isLiked);
@@ -95,7 +105,10 @@ export default function SinglePost() {
 
   const fetchLikesList = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/likes`);
+      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/likes`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
       setLikesList(res?.data?.likes);
       // console.log(res.data.likes)
     } catch (error) {
@@ -105,7 +118,10 @@ export default function SinglePost() {
 
   const fetchCommentsList = async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/comments`);
+      const res = await axios.get(`${import.meta.env.VITE_URL}post/${id}/comments`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
       setCommentsList(res?.data?.comments);
     } catch (error) {
       console.error("Failed to fetch comments list:", error);
@@ -124,7 +140,10 @@ export default function SinglePost() {
       const res = await axios.post(
         `${import.meta.env.VITE_URL}post/${id}/comment`,
         { comment: trimmedComment },
-        { withCredentials: true }
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
       setCommentText("");
       setIsCommentEmpty(false); // Hide validation message
@@ -137,8 +156,10 @@ export default function SinglePost() {
   const addPostToFavorites = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_URL}user/favourites/${post?._id}`,
-        { withCredentials: true }
+        `${import.meta.env.VITE_URL}user/favourites/${post?._id}`, { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+         }
       );
       // console.log(res)
       if (res.status == 200) {
@@ -153,8 +174,10 @@ export default function SinglePost() {
   const RemoveFromFavorites = async (e) => {
     try {
       const res = await axios.get(
-       `${import.meta.env.VITE_URL}user/removeFavourites/${post?._id}`,
-        { withCredentials: true }
+       `${import.meta.env.VITE_URL}user/removeFavourites/${post?._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+       }
       );
       if (res.status == 200) {
         setAddedFav(false);
@@ -168,8 +191,10 @@ export default function SinglePost() {
   const checkIfPostIsFavorite = async () => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_URL}user/favourites/check/${id}`,
-        { withCredentials: true }
+        `${import.meta.env.VITE_URL}user/favourites/check/${id}`, { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        }
       );
       // console.log(res)
       if (res?.data?.isFavourite) setAddedFav(res?.data?.isFavourite);
@@ -181,6 +206,7 @@ export default function SinglePost() {
   const deletePost = async () => {
     try {
       await axios.delete(`${import.meta.env.VITE_URL}post/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
       navigate("/");
@@ -194,6 +220,7 @@ export default function SinglePost() {
       const res = await axios.delete(
        `${import.meta.env.VITE_URL}post/${id}/comment/${commentId}`,
         {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         }
       );

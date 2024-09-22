@@ -1,10 +1,11 @@
 import React, {useState, useEffect} from "react";
 import { Signup as SignupComponent } from '../components'
 import axios from "axios"
+import Cookie from "cookies-js";
 
 const EditProfile = () => {
   const [user, setUser] = useState([]);
-
+  const token = Cookie.get("token");
 
   useEffect(() => {
     const fetchUserData = async () => {

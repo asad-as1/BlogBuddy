@@ -12,6 +12,7 @@ function Profile() {
   const [posts, setPost] = useState([]);
   const [user, setUser] = useState([]);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const token = Cookie.get("token");
 
   useEffect(() => {
     const fetchUserData = async () => {

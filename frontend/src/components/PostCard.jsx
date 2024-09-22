@@ -32,15 +32,16 @@ function PostCard({
             headers: { Authorization: `Bearer ${token}` },
             withCredentials: true,
           });
-          const currentUserId = res?.data?.user?.id;
+          const currentUserId = res?.data?.user?._id;
           setUserId(currentUserId);
           setIsLiked(likes.includes(currentUserId));
           const authordata = await axios.post(
-            `${import.meta.env.VITE_URL}user/getUserById`,{
+            `${import.meta.env.VITE_URL}user/getUserById`,
+            { author },
+            {
               headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true 
-            },
-            { author }
+              withCredentials: true,
+            }
           );
           setAuthorData(authordata?.data?.user);
         } catch (error) {
@@ -60,9 +61,9 @@ function PostCard({
         ? `${import.meta.env.VITE_URL}post/${_id}/unlike`
         : `${import.meta.env.VITE_URL}post/${_id}/like`;
 
-      const res = await axios.post(endpoint, {
+      const res = await axios.post(endpoint, {}, {
         headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true 
+        withCredentials: true,
       });
 
       if (res.status === 200) {

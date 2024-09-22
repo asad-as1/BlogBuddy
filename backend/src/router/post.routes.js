@@ -7,7 +7,7 @@ const { authenticate } = require('../middlewares/auth');
 router.post('/newPost', authenticate, postController.createPost);
 router.get('/allPosts', authenticate, postController.getAllPosts);
 router.get('/search', authenticate, postController.searchPosts);
-router.get('/:postId', postController.getPostById);
+router.get('/:postId', authenticate, postController.getPostById);
 router.put('/:postId', authenticate, postController.updatePost);
 router.delete('/:postId', authenticate, postController.deletePost);
 router.post('/:postId/like', authenticate, postController.likePost);
