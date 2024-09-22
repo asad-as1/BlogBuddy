@@ -14,6 +14,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Favourites from "./pages/Favourites.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import Search from "./pages/Search.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
           <ProtectedRoute element={<EditPost />} />
         ),
       },
+      {
+        path: "*",
+        element: <NotFound />,
+      }
     ],
   },
 ]);

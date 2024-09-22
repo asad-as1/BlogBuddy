@@ -31,7 +31,7 @@ function Signup({ user }) {
   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
 
   useEffect(() => {
-    console.log(user)
+    // console.log(user)
     if (user) {
       reset({
         _id: user._id || "",
