@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Container, PostCard } from "../components";
+import { Container, PostCard } from "../components"; // Import the Error component
 import axios from "axios";
 import Cookie from "cookies-js";
+import Error from "../pages/ErrorPage"
 
 const Favourites = () => {
   const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null); // Add error state
   const token = Cookie.get("token");
 
   useEffect(() => {
@@ -17,11 +19,23 @@ const Favourites = () => {
         setPosts(res.data.favourites);
       } catch (error) {
         console.error("Request failed", error);
+        setError("Failed to fetch favorites."); // Set the error message
       }
     };
 
     fetchData();
-  }, []);
+  }, [token]);
+
+  // Render the Error component if an error occurred
+  if (error) {
+    return (
+      <div className="w-full py-8">
+        <Container>
+          <Error message={error} />
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full py-8">

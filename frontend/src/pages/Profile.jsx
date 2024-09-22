@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { Container, PostCard } from "../components";
+import { Container, PostCard } from "../components"; // Import Error component
 import axios from "axios";
 import { FaUserCircle } from "react-icons/fa";
 import Button from "../components/Button";
 import { useNavigate, useParams } from "react-router-dom";
 import Cookie from "cookies-js";
+import Error from "../pages/ErrorPage";
+import Swal from "sweetalert2"; // Import SweetAlert
+import withReactContent from "sweetalert2-react-content"; // React support for SweetAlert
+
+const MySwal = withReactContent(Swal); // Initialize SweetAlert2 with React
 
 function Profile() {
   const navigate = useNavigate();
-  const { username } = useParams(); // Get the username from the URL
+  const { username } = useParams();
   const [posts, setPost] = useState([]);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
   const [isOwnProfile, setIsOwnProfile] = useState(false);
+  const [error, setError] = useState(null); // Error state
   const token = Cookie.get("token");
 
   useEffect(() => {
@@ -28,10 +34,11 @@ function Profile() {
         setIsOwnProfile(response.data.isOwnProfile);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+        setError("Failed to load user data. Please try again later."); // Set error message
       }
     };
     fetchUserData();
-  }, [username]);
+  }, [username, token]);
 
   // Calculate the total number of hidden (Private) posts
   const totalHiddenPosts = posts.filter(
@@ -40,26 +47,57 @@ function Profile() {
 
   // Handle account deletion
   const handleDeleteAccount = async () => {
-    try {
-      await axios.delete(`${import.meta.env.VITE_URL}user/delete`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-      Cookie.expire('token'); 
-      alert("Account Deleted Successfully!");
-      navigate("/login"); // Redirect to home or login page after deletion
-    } catch (error) {
-      console.error("Failed to delete account:", error);
+    const result = await MySwal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`${import.meta.env.VITE_URL}user/delete`, {
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
+        });
+        Cookie.expire('token');
+        MySwal.fire(
+          "Deleted!",
+          "Your account has been deleted successfully.",
+          "success"
+        ).then(() => {
+          navigate("/login");
+        });
+      } catch (error) {
+        console.error("Failed to delete account:", error);
+        MySwal.fire({
+          icon: "error",
+          title: "Deletion Failed!",
+          text: "An error occurred while deleting your account. Please try again later.",
+        });
+      }
     }
   };
+
+  // Display error if any
+  if (error) {
+    return (
+      <Container>
+        <div className="py-8">
+          <Error message={error} />
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container>
       <div className="w-full py-8 min-h-screen">
-        
         <div className="max-w-md mx-auto p-6 sm:p-8 bg-white shadow-xl rounded-lg border border-gray-300">
           <div className="flex flex-col justify-between items-center sm:flex-row sm:items-start space-y-4 sm:space-y-0 sm:space-x-4">
-            {/* Profile Picture or User Icon */}
             {user.profilePicture ? (
               <img
                 src={user.profilePicture}
@@ -74,8 +112,6 @@ function Profile() {
                 {user.username}
               </h2>
               <p className="text-gray-900 text-lg mt-2">{user.name}</p>
-
-              {/* Total Number of Posts and Hidden (Private) Posts */}
               <div className="flex flex-col sm:flex-row justify-center sm:justify-between gap-4 mt-4">
                 <div className="mt-2 text-center">
                   <strong className="text-blue-950 text-2xl">{posts.length}</strong>
@@ -88,7 +124,6 @@ function Profile() {
               </div>
             </div>
           </div>
-          
           <div className="mt-6">
             {isOwnProfile && (
               <p className="text-gray-900 text-lg">
@@ -150,7 +185,6 @@ function Profile() {
               ))}
           </div>
         </div>
-
       </div>
     </Container>
   );

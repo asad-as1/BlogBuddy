@@ -1,16 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookie from "cookies-js";
 import axios from "axios";
 import { FaBars, FaSun, FaMoon } from "react-icons/fa";
 import logo from "./image/logo.jpg";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
 function Header({ toggleDarkMode, isDarkMode }) {
+  const MySwal = withReactContent(Swal);
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState(false);
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const token = Cookie.get("token");
+  const menuRef = useRef(null); // Create a ref for the menu
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -19,7 +23,6 @@ function Header({ toggleDarkMode, isDarkMode }) {
           const res = await axios.get(`${import.meta.env.VITE_URL}user/check-auth`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          // console.log(res, "check auth header");
           setUser(res.data.user);
           setAuthStatus(true);
         } catch (error) {
@@ -33,7 +36,6 @@ function Header({ toggleDarkMode, isDarkMode }) {
 
     checkAuth();
   }, [token]);
-
 
   // Handle dark mode toggle and store preference in cookies
   const handleDarkModeToggle = () => {
@@ -49,16 +51,42 @@ function Header({ toggleDarkMode, isDarkMode }) {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await axios.post(`${import.meta.env.VITE_URL}user/logout`, {
-        withCredentials: true,
-      });
-      Cookie.expire("token");
-      setAuthStatus(false);
-      setUser(null);
-      navigate("/login");
-    } catch (error) {
-      console.error("Failed to log out:", error);
+    const result = await MySwal.fire({
+      title: 'Are you sure?',
+      text: "You will be logged out of your account!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, logout!',
+      cancelButtonText: 'No, stay logged in!',
+    });
+  
+    if (result.isConfirmed) {
+      try {
+        await axios.post(`${import.meta.env.VITE_URL}user/logout`, {
+          withCredentials: true,
+        });
+        Cookie.expire("token");
+        setAuthStatus(false);
+        setUser(null);
+        MySwal.fire({
+          icon: 'success',
+          title: 'Logged Out!',
+          text: 'You have successfully logged out.',
+          confirmButtonText: 'OK',
+        }).then(() => {
+          navigate("/login");
+        });
+      } catch (error) {
+        console.error("Failed to log out:", error);
+        MySwal.fire({
+          icon: 'error',
+          title: 'Logout Failed',
+          text: 'There was an error logging you out. Please try again.',
+          confirmButtonText: 'Retry',
+        });
+      }
     }
   };
 
@@ -71,6 +99,20 @@ function Header({ toggleDarkMode, isDarkMode }) {
     { name: "Search", slug: "/search", active: authStatus },
     { name: "Favourites", slug: "/user/favourites", active: authStatus },
   ];
+
+  // Close the menu if clicked outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
 
   return (
     <header className="shadow bg-blue-950 text-white">
@@ -130,7 +172,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
                 <FaBars size={28} />
               </button>
               {isMenuOpen && (
-                <div className="absolute top-12 right-0 w-48 bg-blue-950 rounded-lg shadow-lg z-10">
+                <div ref={menuRef} className="absolute top-12 right-0 w-48 bg-blue-950 rounded-lg shadow-lg z-10">
                   <ul className="p-2">
                     {navItems.map(
                       (item) =>

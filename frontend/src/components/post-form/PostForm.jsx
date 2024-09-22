@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { upload } from "../../firebase";
-import { htmlToText } from 'html-to-text';
+import Swal from 'sweetalert2'; // Import SweetAlert
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, setValue, control, getValues, formState: { errors }, setError } = useForm({
@@ -16,12 +16,14 @@ export default function PostForm({ post }) {
       isPublished: post?.isPublished || "Public",
     },
   });
+
   const token = Cookie.get("token");
   const [mediaPreview, setMediaPreview] = useState(post?.media?.url || "");
   const [isVideo, setIsVideo] = useState(post?.media?.isVideo || false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadTime, setUploadTime] = useState(null);
   const [fileError, setFileError] = useState(""); // File input error
+  const [errorMessage, setErrorMessage] = useState(""); // Error message state
   const navigate = useNavigate();
 
   const submit = async (data) => {
@@ -58,16 +60,34 @@ export default function PostForm({ post }) {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
+        Swal.fire({
+          icon: 'success',
+          title: 'Post Updated',
+          text: 'Your post has been updated successfully!',
+        });
       } else {
         await axios.post(`${import.meta.env.VITE_URL}post/newPost`, data, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
+        });
+        Swal.fire({
+          icon: 'success',
+          title: 'Post Created',
+          text: 'Your post has been created successfully!',
         });
       }
 
       navigate("/");
     } catch (error) {
       console.error("Error submitting post:", error);
+      setErrorMessage("There was an error submitting the post. Please try again.");
+      
+      // Show SweetAlert on error
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'There was an error submitting the post. Please try again.',
+      });
     }
   };
 

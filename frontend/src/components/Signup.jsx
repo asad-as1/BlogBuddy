@@ -7,6 +7,7 @@ import { upload } from "../firebase.js";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the eye icons
+import Swal from "sweetalert2"; // Import SweetAlert
 
 function Signup({ user }) {
   const {
@@ -14,8 +15,6 @@ function Signup({ user }) {
     handleSubmit,
     reset,
     setValue,
-    control,
-    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -27,11 +26,9 @@ function Signup({ user }) {
   });
   const token = Cookie.get("token");
   const navigate = useNavigate();
-  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
 
   useEffect(() => {
-    // console.log(user)
     if (user) {
       reset({
         _id: user._id || "",
@@ -44,8 +41,8 @@ function Signup({ user }) {
   }, [user, reset]);
 
   const handleRegister = async (data) => {
-    setError("");
     try {
+      // Upload profile picture if provided
       if (data.profilePicture && data.profilePicture.length > 0) {
         const file = data.profilePicture[0];
         const url = await upload(file);
@@ -53,36 +50,48 @@ function Signup({ user }) {
       } else {
         data.profilePicture = user?.profilePicture || "";
       }
-
+  
       let res;
       if (user) {
-        res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data , {
-          headers: { Authorization: `Bearer ${token}`},
+        // Update user profile
+        res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data, {
+          headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
-        if (res?.status === 200) {
-          alert("Profile Updated Successfully");
+        if (res?.status === 201) {
+          await Swal.fire({
+            icon: "success",
+            title: "Profile Updated Successfully",
+            confirmButtonText: "OK",
+          }).then(() => {
+            reset(); // Reset after the alert
+            navigate(`/`); // Navigate after resetting
+          });
         }
       } else {
+        // Register new user
         res = await axios.post(`${import.meta.env.VITE_URL}user/register`, data);
         if (res?.status === 201) {
-          alert("Successfully Registered");
-          login(data, navigate, setError);
+          await Swal.fire({
+            icon: "success",
+            title: "Successfully Registered",
+            confirmButtonText: "OK",
+          }).then(() => {
+            login(data, navigate, setError);
+            navigate(`/`); // Navigate after login
+          });
         }
       }
-
-      if (res.status === 201) {
-        navigate(`/profile/${user?.username}`);
-      } else {
-        alert("Something went wrong");
-      }
     } catch (error) {
-      if (error?.response?.data?.message === "User already exists")
-        setError(error?.response?.data?.message);
-      else setError("An error occurred");
-      console.log(error);
+      const errorMessage =
+        error?.response?.data?.message || "Something went wrong!";
+      await Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        confirmButtonText: "OK",
+      });
     }
-    reset();
   };
 
   const togglePasswordVisibility = () => {
@@ -90,7 +99,7 @@ function Signup({ user }) {
   };
 
   return (
-    <div className=" text-black flex items-center justify-center min-h-screen p-4">
+    <div className="text-black flex items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
         {!user && (
           <div>
@@ -115,18 +124,20 @@ function Signup({ user }) {
             </h2>
           </div>
         )}
-        {error && <p className="text-red-600 text-center mb-4">{error}</p>}
 
         <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
           <div className="space-y-4">
-            <Input
-              label="Username: "
-              placeholder="Username"
-              {...register("username", {
-                required: true,
-              })}
-              className="w-full"
-            />
+            {/* Show username input only if user is not editing their profile */}
+            {!user && (
+              <Input
+                label="Username: "
+                placeholder="Username"
+                {...register("username", {
+                  required: true,
+                })}
+                className="w-full"
+              />
+            )}
             <Input
               label="Full Name: "
               placeholder="Enter your full name"
@@ -154,7 +165,7 @@ function Signup({ user }) {
                 <div className="relative">
                   <Input
                     label="Password: "
-                    type={showPassword ? "text" : "password"} // Toggle between text and password
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     {...register("password", {
                       required: "Password is required",

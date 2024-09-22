@@ -1,25 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaHeart, FaComment } from "react-icons/fa";
+import { FaHeart } from "react-icons/fa";
 import axios from "axios";
 import Cookie from "cookies-js";
+import Swal from "sweetalert2"; // Import SweetAlert2
 
-function PostCard({
-  _id,
-  title,
-  comments = [], // Default to empty array
-  isPublished,
-  likes = [], // Default to empty array
-  media,
-  author,
-}) {
+function PostCard({ _id, title, comments = [], isPublished, likes = [], media, author }) {
   const [userId, setUserId] = useState(null);
   const [authorData, setAuthorData] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(likes.length);
   const isVideo = media?.isVideo;
   const mediaUrl = typeof media === "string" ? media : media?.url;
-
   const navigate = useNavigate();
   const token = Cookie.get("token");
 
@@ -35,6 +27,7 @@ function PostCard({
           const currentUserId = res?.data?.user?._id;
           setUserId(currentUserId);
           setIsLiked(likes.includes(currentUserId));
+
           const authordata = await axios.post(
             `${import.meta.env.VITE_URL}user/getUserById`,
             { author },
@@ -46,6 +39,7 @@ function PostCard({
           setAuthorData(authordata?.data?.user);
         } catch (error) {
           console.error("Error fetching user profile:", error);
+          showAlert("Failed to load the post. Please try again later.");
         }
       };
 
@@ -72,11 +66,19 @@ function PostCard({
       }
     } catch (error) {
       console.error("Error liking/unliking post:", error);
+      showAlert("Failed to like the post. Please try again later.");
     }
   };
 
-  // Conditionally render the PostCard only if the post is published as "Public"
-  // if (isPublished !== "Public") return null;
+  // Function to show alert
+  const showAlert = (message) => {
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: message,
+      confirmButtonColor: "#f56565", // Red color for confirm button
+    });
+  };
 
   return (
     <div className="w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">

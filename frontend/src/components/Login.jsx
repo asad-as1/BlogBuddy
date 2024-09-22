@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Swal from 'sweetalert2'; // Import SweetAlert
 
 // Define the login function outside the component
 export const login = async (data, navigate, setError) => {
@@ -17,9 +18,26 @@ export const login = async (data, navigate, setError) => {
         secure: true,
       };
       Cookie.set("token", res.data.token, val);
-      navigate("/");
+
+      // Show SweetAlert on successful login
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'You are now logged in!',
+        timer: 1500,
+        showConfirmButton: false,
+        willClose: () => {
+          navigate("/"); // Redirect to the home page after the alert closes
+        },
+      });
     }
   } catch (error) {
+    // Show SweetAlert on login error
+    Swal.fire({
+      icon: 'error',
+      title: 'Login Failed',
+      text: error.response?.data?.message || "Login failed. Please try again.",
+    });
     setError(error.response?.data?.message || "Login failed. Please try again.");
   }
 };
@@ -33,8 +51,7 @@ function Login() {
   useEffect(() => {
     const token = Cookie.get("token");
     if (token) {
-      // Redirect to the home page if a token is present
-      navigate("/");
+      navigate("/"); // Redirect to the home page if a token is present
     }
   }, [navigate]);
 
