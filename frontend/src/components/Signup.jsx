@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { login } from "./Login.jsx";
 import { upload } from "../firebase.js";
 import axios from "axios";
+import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the eye icons
 
 function Signup({ user }) {
@@ -24,14 +25,16 @@ function Signup({ user }) {
       bio: "",
     },
   });
-
+  const token = Cookie.get("token");
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
 
   useEffect(() => {
+    console.log(user)
     if (user) {
       reset({
+        _id: user._id || "",
         username: user.username || "",
         name: user.name || "",
         email: user.email || "",
@@ -53,7 +56,8 @@ function Signup({ user }) {
 
       let res;
       if (user) {
-        res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data, {
+        res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data , {
+          headers: { Authorization: `Bearer ${token}`},
           withCredentials: true,
         });
         if (res?.status === 200) {

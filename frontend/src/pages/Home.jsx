@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Button } from '../components/index';
 import Cookie from "cookies-js";
+import { Login } from '../components'
+
 
 function Home() {
   const navigate = useNavigate();
@@ -71,19 +73,10 @@ function Home() {
   }
 
   // Display error message if any
-  if (error) {
+  if (!authStatus) {
     return (
-      <div className="w-full py-8 mt-4 text-center">
-        <Container>
-          <div className="flex flex-wrap items-center justify-center h-80 mt-4 mb-3">
-            <div className="p-2 w-full">
-              <h1 className="text-2xl font-bold text-red-500">
-                {error}
-              </h1>
-              <Button children={"Log In"} onClick={() => { navigate("/login"); }} />
-            </div>
-          </div>
-        </Container>
+      <div className='py-8'>
+          <Login />
       </div>
     );
   }
