@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Container, PostCard, Login } from '../components';
+import { Container, PostCard } from '../components';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { Button } from '../components/index';
 import Cookie from "cookies-js";
-import { isTokenValid } from '../components/auth';
 
 function Home() {
   const navigate = useNavigate();
+  const [authStatus, setAuthStatus] = useState(null); 
   const [loading, setLoading] = useState(true); 
   const [posts, setPosts] = useState([]);
   const [user, setUser] = useState(null); 
@@ -16,55 +16,93 @@ function Home() {
 
   const BACKEND_URL = import.meta.env.VITE_URL;
 
-
-  const isAuthenticated = isTokenValid();
-  // console.log(isAuthenticated)
-
+  
   useEffect(() => {
-    if (isAuthenticated) {
+    const checkAuth = async () => {
+      if (token) {
+        setLoading(true); // Start loading when checking auth
+        try {
+          const res = await axios.get(`${BACKEND_URL}user/check-auth`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          setAuthStatus(true); 
+          setUser(res?.data?.user);
+          // console.log(res.data.user)
+          setLoading(false); 
+        } catch (error) {
+          setAuthStatus(false); 
+          setError('Authentication check failed. Please log in.');
+          console.error('Authentication check failed', error);
+          setLoading(false); 
+        }
+      } else {
+        setLoading(false); 
+      }
+    };
+  
+    checkAuth();
+  }, [token]);
+  
+
+ 
+  useEffect(() => {
+    if (authStatus) {
       const fetchPosts = async () => {
         try {
           const res = await axios.get(`${BACKEND_URL}post/allPosts`);
-          // console.log(res, "post")
           setPosts(res.data);
+          setUser(res?.data?.user);
         } catch (error) {
           console.error('Request failed', error);
         }
       };
-      fetchPosts();
-
-      const fetchUserData = async () => {
-        try {
-          const res = await axios.get(`${BACKEND_URL}user/profile`, {
-            headers: { Authorization: `Bearer ${token}` },
-            withCredentials: true,
-          });
-          // console.log(res, "user")
-          setUser(res?.data?.user);
-        } catch (error) {
-          console.error("Failed to fetch user data:", error);
-        }
-      };
-      fetchUserData();
-    } 
-    else {
-      setLoading(false); 
-      navigate('/login');
+      fetchPosts(); 
     }
-  }, [isAuthenticated, token]);
+  }, [authStatus]);
 
- 
-  // if (loading) {
-  //   return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
-  // }
+  
+  // useEffect(() => {
+  //   if (authStatus) {
+  //     const fetchUserData = async () => {
+  //       try {
+  //         const res = await axios.get(`${BACKEND_URL}user/profile`, {
+  //           headers: { Authorization: `Bearer ${token}` },
+  //           withCredentials: true,
+  //         });
+  //         setUser(res?.data?.user);
+  //       } catch (error) {
+  //         console.error("Failed to fetch user data:", error);
+  //       }
+  //     };
+  //     fetchUserData();
+  //   }
+  // }, [authStatus, token]);
 
-  // if (error) {
-  //   return (
-  //     <Login/>
-  //   );
-  // }
+  // Loading state
+  if (loading) {
+    return <div className="w-full py-8 mt-4 text-center">Loading...</div>;
+  }
 
-  if (posts.length === 0) {
+  // Display error message if any
+  if (error) {
+    return (
+      <div className="w-full py-8 mt-4 text-center">
+        <Container>
+          <div className="flex flex-wrap items-center justify-center h-80 mt-4 mb-3">
+            <div className="p-2 w-full">
+              <h1 className="text-2xl font-bold text-red-500">
+                {error}
+              </h1>
+              <Button children={"Log In"} onClick={() => { navigate("/login"); }} />
+            </div>
+          </div>
+        </Container>
+      </div>
+    );
+  }
+
+  // Render a button if no posts exist
+  if (authStatus && posts.length === 0) {
     return (
       <div className="w-full py-8 mt-4 text-center">
         <Container>
@@ -80,7 +118,7 @@ function Home() {
     );
   }
 
-  
+  // Main posts rendering logic based on user role
   return (
     <div className='w-full py-8'>
       <Container>

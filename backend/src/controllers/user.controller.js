@@ -73,7 +73,7 @@ exports.logout = (req, res) => {
 
 // Get user profile
 exports.getProfile = async (req, res) => {
-  console.log(req.user);
+  // console.log(req.user);
   try {
     const user = await User.findById(req.user.id).select('-password').populate('posts'); // Exclude the password field
     if (!user) {
