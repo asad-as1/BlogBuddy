@@ -70,16 +70,29 @@ export default function SinglePost() {
       url: window.location.href,
     };
   
+    let shared = false;
+  
+    const showSuccessAlert = () => {
+      MySwal.fire({
+        icon: "success",
+        title: "Post shared successfully!",
+        text: "Your post has been shared.",
+        confirmButtonText: "OK",
+      });
+    };
+  
     if (navigator.share) {
       navigator
         .share(shareData)
         .then(() => {
-          MySwal.fire({
-            icon: "success",
-            title: "Post shared successfully!",
-            text: "Your post has been shared.",
-            confirmButtonText: "OK",
-          });
+          shared = true;
+  
+          // Set a timer to show the success message after 1.5 seconds
+          setTimeout(() => {
+            if (shared) {
+              showSuccessAlert();
+            }
+          }, 1500);
         })
         .catch((error) => {
           console.error("Error sharing post:", error);
@@ -106,7 +119,9 @@ export default function SinglePost() {
       });
     }
   };
-
+  
+  
+  
   const handleLike = async () => {
     if (!loggedInUserId) return;
 
@@ -338,7 +353,7 @@ const RemoveFromFavorites = async (e) => {
         });
       }
     }
-  };
+  }; 
 
   // console.log(likesList)
 

@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import Swal from 'sweetalert2'; // Import SweetAlert
+import Swal from 'sweetalert2';
 
-// Define the login function outside the component
-export const login = async (data, navigate, setError) => {
+// Login function
+export const login = async (data, navigate, setError, from) => {
   setError("");
   try {
     const res = await axios.post(`${import.meta.env.VITE_URL}user/login`, data);
@@ -19,20 +19,17 @@ export const login = async (data, navigate, setError) => {
       };
       Cookie.set("token", res.data.token, val);
 
-      // Show SweetAlert on successful login
       Swal.fire({
         icon: 'success',
         title: 'Login Successful',
         text: 'You are now logged in!',
         timer: 1500,
         showConfirmButton: false,
-        willClose: () => {
-          navigate("/"); // Redirect to the home page after the alert closes
-        },
+      }).then(() => {
+        navigate(from || "/"); // Redirect to 'from' or home
       });
     }
   } catch (error) {
-    // Show SweetAlert on login error
     Swal.fire({
       icon: 'error',
       title: 'Login Failed',
@@ -44,6 +41,9 @@ export const login = async (data, navigate, setError) => {
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation(); // Use useLocation to access location.state
+  const from = location.state?.from || "/"; // Use the passed `from` or default to "/"
+
   const { register, handleSubmit } = useForm();
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -51,13 +51,12 @@ function Login() {
   useEffect(() => {
     const token = Cookie.get("token");
     if (token) {
-      navigate("/"); // Redirect to the home page if a token is present
+      navigate("/"); // Redirect to homepage if already logged in
     }
   }, [navigate]);
 
-  // Use the login function inside the component
   const onSubmit = (data) => {
-    login(data, navigate, setError);
+    login(data, navigate, setError, from); // Pass 'from' to login function
   };
 
   return (

@@ -2,20 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
-import { login } from "./Login.jsx";
+import { login } from "./Login.jsx"; // Import login function
 import { upload } from "../firebase.js";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the eye icons
 import Swal from "sweetalert2"; // Import SweetAlert
 
-function Signup({ user }) {
+function Signup({ user, location }) { // Receive location as a prop
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
-    formState: { errors },
+    formState: { errors } // Destructure the errors object
   } = useForm({
     defaultValues: {
       username: "",
@@ -50,7 +49,7 @@ function Signup({ user }) {
       } else {
         data.profilePicture = user?.profilePicture || "";
       }
-  
+
       let res;
       if (user) {
         // Update user profile
@@ -65,7 +64,7 @@ function Signup({ user }) {
             confirmButtonText: "OK",
           }).then(() => {
             reset(); // Reset after the alert
-            navigate(`/`); // Navigate after resetting
+            navigate("/"); // Navigate after resetting
           });
         }
       } else {
@@ -77,8 +76,8 @@ function Signup({ user }) {
             title: "Successfully Registered",
             confirmButtonText: "OK",
           }).then(() => {
-            login(data, navigate, setError);
-            navigate(`/`); // Navigate after login
+            // Log the user in after successful registration
+            login(data, navigate, () => {}, "/"); // Pass 'from' to login function for redirection
           });
         }
       }
@@ -127,7 +126,6 @@ function Signup({ user }) {
 
         <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
           <div className="space-y-4">
-            {/* Show username input only if user is not editing their profile */}
             {!user && (
               <Input
                 label="Username: "
