@@ -385,7 +385,7 @@ const RemoveFromFavorites = async (e) => {
                   controls
                   autoPlay
                   loop
-                  className="rounded-xl w-full h-auto max-h-96 object-cover"
+                  className="rounded-xl w-4/5 h-auto max-h-96 object-top"
                 >
                   <source src={post?.media?.url} type="video/mp4" />
                   Your browser does not support the video tag.
@@ -394,7 +394,7 @@ const RemoveFromFavorites = async (e) => {
                 <img
                   src={post?.media?.url}
                   alt={post?.title}
-                  className="rounded-xl w-full h-auto max-h-96 object-cover"
+                  className="rounded-xl w-4/5 h-auto max-h-96 object-top"
                 />
               )}
             </div>
