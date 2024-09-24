@@ -49,7 +49,7 @@ function Signup({ user, location }) { // Receive location as a prop
       } else {
         data.profilePicture = user?.profilePicture || "";
       }
-
+  
       let res;
       if (user) {
         // Update user profile
@@ -62,6 +62,7 @@ function Signup({ user, location }) { // Receive location as a prop
             icon: "success",
             title: "Profile Updated Successfully",
             confirmButtonText: "OK",
+            confirmButtonColor: "#007BFF", // Set the confirm button color to blue
           }).then(() => {
             reset(); // Reset after the alert
             navigate("/"); // Navigate after resetting
@@ -75,6 +76,7 @@ function Signup({ user, location }) { // Receive location as a prop
             icon: "success",
             title: "Successfully Registered",
             confirmButtonText: "OK",
+            confirmButtonColor: "#007BFF", // Set the confirm button color to blue
           }).then(() => {
             // Log the user in after successful registration
             login(data, navigate, () => {}, "/"); // Pass 'from' to login function for redirection
@@ -89,9 +91,11 @@ function Signup({ user, location }) { // Receive location as a prop
         title: "Error",
         text: errorMessage,
         confirmButtonText: "OK",
+        confirmButtonColor: "#007BFF", // Set the confirm button color to blue
       });
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);

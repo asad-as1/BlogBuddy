@@ -4,11 +4,9 @@ import Cookie from "cookies-js";
 import axios from "axios";
 import { FaBars, FaSun, FaMoon } from "react-icons/fa";
 import logo from "./image/logo.jpg";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import LogoutBtn from "./LogoutBtn"; 
 
 function Header({ toggleDarkMode, isDarkMode }) {
-  const MySwal = withReactContent(Swal);
   const navigate = useNavigate();
   const [authStatus, setAuthStatus] = useState(false);
   const [user, setUser] = useState(null);
@@ -49,46 +47,6 @@ function Header({ toggleDarkMode, isDarkMode }) {
       toggleDarkMode(true); // Set dark mode if cookie exists
     }
   }, []);
-
-  const handleLogout = async () => {
-    const result = await MySwal.fire({
-      title: 'Are you sure?',
-      text: "You will be logged out of your account!",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, logout!',
-      cancelButtonText: 'No, stay logged in!',
-    });
-  
-    if (result.isConfirmed) {
-      try {
-        await axios.post(`${import.meta.env.VITE_URL}user/logout`, {
-          withCredentials: true,
-        });
-        Cookie.expire("token");
-        setAuthStatus(false);
-        setUser(null);
-        MySwal.fire({
-          icon: 'success',
-          title: 'Logged Out!',
-          text: 'You have successfully logged out.',
-          confirmButtonText: 'OK',
-        }).then(() => {
-          navigate("/login");
-        });
-      } catch (error) {
-        console.error("Failed to log out:", error);
-        MySwal.fire({
-          icon: 'error',
-          title: 'Logout Failed',
-          text: 'There was an error logging you out. Please try again.',
-          confirmButtonText: 'Retry',
-        });
-      }
-    }
-  };
 
   const navItems = [
     { name: "Home", slug: "/", active: true },
@@ -143,12 +101,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
               )}
               {authStatus && (
                 <li>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 rounded-full hover:bg-red-700 transition duration-300"
-                  >
-                    Logout
-                  </button>
+                  <LogoutBtn setAuthStatus={setAuthStatus} /> {/* Use LogoutBtn here */}
                 </li>
               )}
               {/* Dark Mode Toggle Button for Large Screens */}
@@ -192,12 +145,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
                     )}
                     {authStatus && (
                       <li>
-                        <button
-                          onClick={handleLogout}
-                          className="block px-4 py-2 rounded-full hover:bg-red-700 text-left"
-                        >
-                          Logout
-                        </button>
+                        <LogoutBtn setAuthStatus={setAuthStatus} /> {/* Use LogoutBtn here */}
                       </li>
                     )}
                     {/* Dark Mode Toggle Button Inside Menu */}

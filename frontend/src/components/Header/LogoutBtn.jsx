@@ -4,6 +4,7 @@ import axios from 'axios';
 import Cookie from 'cookies-js';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
+import 'sweetalert2/dist/sweetalert2.min.css'; 
 
 const MySwal = withReactContent(Swal);
 
@@ -16,9 +17,9 @@ function LogoutBtn({ setAuthStatus }) {
       text: "You will be logged out of your account!",
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, logout!',
+      confirmButtonColor: '#d33', // Red color for confirm button background
+      cancelButtonColor: '#3085d6', // Blue color for cancel button background
+      confirmButtonText: 'OK', // No need for custom HTML, rely on button color
       cancelButtonText: 'No, stay logged in!',
     });
 
@@ -33,7 +34,8 @@ function LogoutBtn({ setAuthStatus }) {
           icon: 'success',
           title: 'Logged Out!',
           text: 'You have successfully logged out.',
-          confirmButtonText: 'OK',
+          confirmButtonColor: '#3085d6', // Use color for the OK button
+          confirmButtonText: 'OK', // Just use text, the button color will stand out
         }).then(() => {
           navigate('/login'); // Redirect to login page after confirmation
         });
@@ -43,6 +45,7 @@ function LogoutBtn({ setAuthStatus }) {
           icon: 'error',
           title: 'Logout Failed',
           text: 'There was an error logging you out. Please try again.',
+          confirmButtonColor: '#d33', // Red button for retry
           confirmButtonText: 'Retry',
         });
       }
@@ -53,8 +56,7 @@ function LogoutBtn({ setAuthStatus }) {
     <button
       className='inline-block px-6 py-2 duration-200 hover:bg-blue-900 rounded-full'
       onClick={logoutHandler}
-    >
-      Logout
+    >Logout
     </button>
   );
 }

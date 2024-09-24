@@ -78,6 +78,7 @@ export default function SinglePost() {
         title: "Post shared successfully!",
         text: "Your post has been shared.",
         confirmButtonText: "OK",
+        confirmButtonColor: "#007BFF",
       });
     };
   
@@ -119,7 +120,6 @@ export default function SinglePost() {
       });
     }
   };
-  
   
   
   const handleLike = async () => {
@@ -215,6 +215,7 @@ export default function SinglePost() {
           title: "Post Added to Favorites!",
           text: "Post added successfully to your favorites.",
           confirmButtonText: "OK",
+          confirmButtonColor: "#007BFF",
         });
       }
     } catch (error) {
@@ -246,6 +247,7 @@ const RemoveFromFavorites = async (e) => {
         title: "Post Removed from Favorites!",
         text: "Post removed successfully from your favorites.",
         confirmButtonText: "OK",
+        confirmButtonColor: "#007BFF",
       });
     }
   } catch (error) {
@@ -299,6 +301,7 @@ const RemoveFromFavorites = async (e) => {
           title: 'Deleted!',
           text: 'Your post has been deleted.',
           confirmButtonText: 'OK',
+          confirmButtonColor: "#007BFF",
         });
         navigate("/");
       } catch (error) {
@@ -341,6 +344,7 @@ const RemoveFromFavorites = async (e) => {
           title: 'Deleted!',
           text: 'Your comment has been deleted.',
           confirmButtonText: 'OK',
+          confirmButtonColor: "#007BFF",
         });
       } catch (error) {
         setErrorMessage("It seems you're not connected to the internet. Check your connection and retry."); // Set error message
@@ -367,7 +371,7 @@ const RemoveFromFavorites = async (e) => {
   }, [id, errorMessage]);
 
   return (
-    <div className="py-8">
+    <div className="p-8">
       <Container>
         {/* Display error message if exists */}
         {errorMessage ? (

@@ -64,6 +64,7 @@ export default function PostForm({ post }) {
           icon: 'success',
           title: 'Post Updated',
           text: 'Your post has been updated successfully!',
+          confirmButtonColor: '#3085d6', // Set the OK button color to blue
         });
       } else {
         await axios.post(`${import.meta.env.VITE_URL}post/newPost`, data, {
@@ -74,6 +75,7 @@ export default function PostForm({ post }) {
           icon: 'success',
           title: 'Post Created',
           text: 'Your post has been created successfully!',
+          confirmButtonColor: '#3085d6', // Set the OK button color to blue
         });
       }
 
@@ -87,6 +89,7 @@ export default function PostForm({ post }) {
         icon: 'error',
         title: 'Oops...',
         text: 'There was an error submitting the post. Please try again.',
+        confirmButtonColor: '#d33', // Keep this red for error
       });
     }
   };

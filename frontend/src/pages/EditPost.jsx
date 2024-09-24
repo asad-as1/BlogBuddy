@@ -34,6 +34,8 @@ function EditPost() {
           icon: 'error',
           title: 'Error!',
           text: 'Failed to fetch post data. Please try again.',
+          confirmButtonColor: '#3085d6', // Blue button color
+          confirmButtonText: 'OK',
         });
       }
     };
@@ -56,6 +58,8 @@ function EditPost() {
           icon: 'success',
           title: 'Post Updated!',
           text: 'Your post has been successfully updated.',
+          confirmButtonColor: '#3085d6', // Blue button color
+          confirmButtonText: 'OK',
         });
       }
     } catch (error) {
@@ -65,6 +69,8 @@ function EditPost() {
         icon: 'error',
         title: 'Update Failed!',
         text: 'An error occurred while updating the post.',
+        confirmButtonColor: '#d33', // Red button for retry
+        confirmButtonText: 'Retry',
       });
     }
   };
