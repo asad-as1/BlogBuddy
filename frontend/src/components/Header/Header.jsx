@@ -4,7 +4,7 @@ import Cookie from "cookies-js";
 import axios from "axios";
 import { FaBars, FaSun, FaMoon } from "react-icons/fa";
 import logo from "./image/logo.jpg";
-import LogoutBtn from "./LogoutBtn"; 
+import LogoutBtn from "./LogoutBtn";
 
 function Header({ toggleDarkMode, isDarkMode }) {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const token = Cookie.get("token");
-  const menuRef = useRef(null); // Create a ref for the menu
+  const menuRef = useRef(null);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,7 +35,6 @@ function Header({ toggleDarkMode, isDarkMode }) {
     checkAuth();
   }, [token]);
 
-  // Handle dark mode toggle and store preference in cookies
   const handleDarkModeToggle = () => {
     toggleDarkMode();
     Cookie.set("darkMode", !isDarkMode);
@@ -44,7 +43,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
   useEffect(() => {
     const darkModePreference = Cookie.get("darkMode");
     if (darkModePreference === "true") {
-      toggleDarkMode(true); // Set dark mode if cookie exists
+      toggleDarkMode(true);
     }
   }, []);
 
@@ -58,7 +57,6 @@ function Header({ toggleDarkMode, isDarkMode }) {
     { name: "Favourites", slug: "/user/favourites", active: authStatus },
   ];
 
-  // Close the menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -101,7 +99,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
               )}
               {authStatus && (
                 <li>
-                  <LogoutBtn setAuthStatus={setAuthStatus} /> {/* Use LogoutBtn here */}
+                  <LogoutBtn setAuthStatus={setAuthStatus} />
                 </li>
               )}
               {/* Dark Mode Toggle Button for Large Screens */}
@@ -136,7 +134,7 @@ function Header({ toggleDarkMode, isDarkMode }) {
                                 navigate(item.slug);
                                 setIsMenuOpen(false);
                               }}
-                              className="block px-4 py-2 rounded-full hover:bg-blue-900 text-left"
+                              className="block w-full px-4 py-2 rounded-full hover:bg-blue-900 text-left"
                             >
                               {item.name}
                             </button>
@@ -144,8 +142,8 @@ function Header({ toggleDarkMode, isDarkMode }) {
                         )
                     )}
                     {authStatus && (
-                      <li>
-                        <LogoutBtn setAuthStatus={setAuthStatus} /> {/* Use LogoutBtn here */}
+                      <li className="mb-2">
+                        <LogoutBtn setAuthStatus={setAuthStatus} />
                       </li>
                     )}
                     {/* Dark Mode Toggle Button Inside Menu */}
@@ -154,17 +152,13 @@ function Header({ toggleDarkMode, isDarkMode }) {
                         handleDarkModeToggle();
                         setIsMenuOpen(false);
                       }}
-                      className="flex items-center cursor-pointer justify-between px-4 py-2 hover:bg-blue-900 rounded-full"
+                      className="flex items-center cursor-pointer justify-between px-4 py-2 hover:bg-blue-900 rounded-full w-full"
                     >
-                      <span className="flex items-center">
+                      <span className="flex items-center w-full">
                         <span className="mr-2">
                           {isDarkMode ? "Light Mode" : "Dark Mode"}
                         </span>
-                        {isDarkMode ? (
-                          <FaSun size={20} />
-                        ) : (
-                          <FaMoon size={20} />
-                        )}
+                        {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
                       </span>
                     </li>
                   </ul>
