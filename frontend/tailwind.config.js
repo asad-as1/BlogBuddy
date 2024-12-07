@@ -5,7 +5,11 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        xs: "300px", // Customize the width for `xs`
+      },
+    },
   },
   darkMode: 'class', // Add this line to enable dark mode using the 'class' strategy
   plugins: [],

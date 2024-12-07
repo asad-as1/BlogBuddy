@@ -2,19 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
-import { login } from "./Login.jsx"; // Import login function
+import { login } from "./Login.jsx";
 import { upload } from "../firebase.js";
 import axios from "axios";
 import Cookie from "cookies-js";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // Import the eye icons
-import Swal from "sweetalert2"; // Import SweetAlert
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import Side from "./Side.jsx"
 
-function Signup({ user, location }) { // Receive location as a prop
+
+function Signup({ user, location }) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors } // Destructure the errors object
+    formState: { errors }
   } = useForm({
     defaultValues: {
       username: "",
@@ -23,9 +25,10 @@ function Signup({ user, location }) { // Receive location as a prop
       bio: "",
     },
   });
+  
   const token = Cookie.get("token");
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false); // State for toggling password visibility
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -62,10 +65,10 @@ function Signup({ user, location }) { // Receive location as a prop
             icon: "success",
             title: "Profile Updated Successfully",
             confirmButtonText: "OK",
-            confirmButtonColor: "#007BFF", // Set the confirm button color to blue
+            confirmButtonColor: "#007BFF",
           }).then(() => {
-            reset(); // Reset after the alert
-            navigate("/"); // Navigate after resetting
+            reset();
+            navigate("/");
           });
         }
       } else {
@@ -76,10 +79,9 @@ function Signup({ user, location }) { // Receive location as a prop
             icon: "success",
             title: "Successfully Registered",
             confirmButtonText: "OK",
-            confirmButtonColor: "#007BFF", // Set the confirm button color to blue
+            confirmButtonColor: "#007BFF",
           }).then(() => {
-            // Log the user in after successful registration
-            login(data, navigate, () => {}, "/"); // Pass 'from' to login function for redirection
+            login(data, navigate, () => {}, "/");
           });
         }
       }
@@ -91,45 +93,48 @@ function Signup({ user, location }) { // Receive location as a prop
         title: "Error",
         text: errorMessage,
         confirmButtonText: "OK",
-        confirmButtonColor: "#007BFF", // Set the confirm button color to blue
+        confirmButtonColor: "#007BFF",
       });
     }
   };
-  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
-
   return (
-    <div className="text-black flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-md bg-gray-100 rounded-xl p-6 border border-gray-300 shadow-md">
-        {!user && (
-          <div>
-            <h2 className="text-center text-black text-xl sm:text-2xl font-bold leading-tight mb-4">
-              Sign up to create an account
-            </h2>
-            <p className="text-center text-sm sm:text-base text-black/60 mb-4">
-              Already have an account?&nbsp;
-              <Link
-                to="/login"
-                className="font-medium text-blue-600 transition-all duration-200 hover:underline"
-              >
-                Sign In
-              </Link>
-            </p>
-          </div>
-        )}
-        {user && (
-          <div>
-            <h2 className="text-center text-black text-xl sm:text-2xl font-bold leading-tight mb-4">
-              Edit Your Profile
-            </h2>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
-          <div className="space-y-4">
+    <div className="min-h-screen flex flex-col lg:flex-row -mt-10">
+      {/* Left Side - Website Description */}
+      <Side/>
+  
+      {/* Right Side - Signup Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+        <div className="bg-white w-full max-w-md rounded-xl p-8 shadow-lg border border-gray-200">
+          {!user && (
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                Sign up to create an account
+              </h2>
+              <p className="text-gray-600">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-blue-600 hover:underline font-semibold"
+                >
+                  Sign In
+                </Link>
+              </p>
+            </div>
+          )}
+  
+          {user && (
+            <div className="mb-6 text-center">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Edit Your Profile
+              </h2>
+            </div>
+          )}
+  
+          <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
             {!user && (
               <Input
                 label="Username: "
@@ -232,11 +237,12 @@ function Signup({ user, location }) { // Receive location as a prop
             <Button type="submit" className="w-full mt-4">
               {user ? "Save Changes" : "Create Account"}
             </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );
+  
 }
 
 export default Signup;
