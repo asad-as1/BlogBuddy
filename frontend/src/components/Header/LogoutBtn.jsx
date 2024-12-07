@@ -37,7 +37,7 @@ function LogoutBtn({ setAuthStatus }) {
           confirmButtonColor: '#3085d6', // Use color for the OK button
           confirmButtonText: 'OK', // Just use text, the button color will stand out
         }).then(() => {
-          navigate('/login'); // Redirect to login page after confirmation
+          navigate('/'); // Redirect to login page after confirmation
         });
       } catch (error) {
         console.error('Logout failed', error);

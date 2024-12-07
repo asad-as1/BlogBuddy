@@ -10,6 +10,7 @@ router.get('/check-auth', authenticate, isAuthenticated.checkAuth);
 router.post('/logout', userController.logout);
 router.get('/profile', authenticate, userController.getProfile);
 router.get('/profile/:username', authenticate, userController.getUsername);
+router.post('/username', userController.getUsernameById);
 router.post('/getUserById', userController.getUserById);
 router.put('/profile', authenticate, userController.updateProfile);
 router.delete('/delete', authenticate, userController.deleteUser);

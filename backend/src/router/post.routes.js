@@ -5,7 +5,7 @@ const { authenticate } = require('../middlewares/auth');
 
 // router.post('/newPost', postController.createPost);  // while testing authenticate is not required
 router.post('/newPost', authenticate, postController.createPost);
-router.get('/allPosts', authenticate, postController.getAllPosts);
+router.get('/allPosts', postController.getAllPosts);
 router.get('/search', authenticate, postController.searchPosts);
 router.get('/:postId', authenticate, postController.getPostById);
 router.put('/:postId', authenticate, postController.updatePost);

@@ -102,6 +102,20 @@ exports.getUsername = async (req, res) => {
   }
 };
 
+exports.getUsernameById = async (req, res) => {
+  try {
+    const { id } = req.body;
+    const user = await User.findById(id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    let username = user.username
+    res.status(200).json({ username });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+};
+
 // Get user by ID
 exports.getUserById = async (req, res) => {
   try {

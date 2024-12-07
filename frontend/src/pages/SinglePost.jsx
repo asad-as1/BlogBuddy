@@ -379,14 +379,15 @@ const RemoveFromFavorites = async (e) => {
         ) : (
           <>
             {/* Post Media */}
-            <div className="w-full flex justify-center mb-4 relative border rounded-xl p-5 bg-white shadow-lg">
+            <div className="w-full h-screen flex justify-center relative rounded-xl">
               {post?.media?.isVideo ? (
                 <video
                   controls
                   autoPlay
                   loop
-                  className="rounded-xl w-4/5 h-auto max-h-96 object-top"
-                >
+                  className="rounded-xl object-fill border border-white"
+                  style={{ height: "70%", width: "85%"}}
+                  >
                   <source src={post?.media?.url} type="video/mp4" />
                   Your browser does not support the video tag.
                 </video>
@@ -394,18 +395,19 @@ const RemoveFromFavorites = async (e) => {
                 <img
                   src={post?.media?.url}
                   alt={post?.title}
-                  className="rounded-xl w-4/5 h-auto max-h-96 object-top"
+                  className="rounded-xl object-fill border border-white"
+                  style={{ height: "75%", width: "85%"}}
                 />
               )}
             </div>
   
             {/* Post Details */}
-            <div className="w-full mb-6">
-              <h1 className="text-3xl font-bold mb-2">{post?.title}</h1>
-              <div className="w-full mb-6 leading-relaxed">
+            <div className="w-full -mt-24 mb-6">
+              <h1 className="text-3xl text-center font-bold mb-2">{post?.title}</h1>
+              <div className="w-full text-center mb-6 leading-relaxed">
                 {parse(post?.content || "")}
               </div>
-              <p className="mb-4 flex items-center">
+              <p className="mb-4 text-center">
                 Posted by:
                 <Link
                   to={`/profile/${post?.author?._id}`}

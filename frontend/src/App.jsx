@@ -22,7 +22,7 @@ function App() {
   return (
     <div className={`min-h-screen flex flex-col justify-between ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
       <Header toggleDarkMode={toggleDarkMode} isDarkMode={isDarkMode} />
-      <main className="flex-grow">
+      <main className="flex-grow mt-20">
         <ScrollToTop />
         <Outlet />
       </main>

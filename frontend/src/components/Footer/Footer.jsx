@@ -8,7 +8,7 @@ function Footer() {
         <div className="flex flex-wrap justify-between">
           <div className="w-full p-4 md:w-5/12">
             <p className="text-sm">
-              &copy; Copyright 2024. All Rights Reserved by Mohd Asad Ansari.
+              &copy; Copyright 2025. All Rights Reserved by Mohd Asad Ansari.
             </p>
           </div>
           <div className="w-full p-4 md:w-2/12">
