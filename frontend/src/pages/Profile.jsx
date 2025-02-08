@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, PostCard } from "../components";
+import { getStorage, ref, deleteObject } from "firebase/storage"
 import axios from "axios";
 import { 
   UserCircle2, 
@@ -59,16 +60,43 @@ function Profile() {
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Delete Account",
-      cancelButtonText: "Cancel"
+      cancelButtonText: "Cancel",
     });
-
+  
     if (result.isConfirmed) {
       try {
+        const storage = getStorage();
+  
+        // Delete all user posts from Firebase Storage
+        for (const post of posts) {
+          // console.log(post, "hii")
+          if (post.media.url) {
+            const filePath = decodeURIComponent(post.media.url.split("/").pop().split("?")[0]);
+            const fileRef = ref(storage, filePath);
+            await deleteObject(fileRef).catch((error) =>
+              console.error("Error deleting file:", error)
+            );
+          }
+        }
+  
+        // Delete user profile picture from Firebase Storage (if exists)
+        if (user.profilePicture) {
+          const filePath = decodeURIComponent(user.profilePicture.split("/").pop().split("?")[0]);
+          const fileRef = ref(storage, filePath);
+          await deleteObject(fileRef).catch((error) =>
+            console.error("Error deleting profile picture:", error)
+          );
+        }
+  
+        // Delete user from database
         await axios.delete(`${import.meta.env.VITE_URL}user/delete`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
-        Cookie.expire('token');
+  
+        // Expire user session
+        Cookie.expire("token");
+  
         MySwal.fire({
           title: "Account Deleted",
           text: "Your account has been permanently removed.",
@@ -87,6 +115,7 @@ function Profile() {
       }
     }
   };
+  
 
   if (error) {
     return (
@@ -173,7 +202,7 @@ function Profile() {
                   <span>Your Favourites</span>
                 </Button>
                 <Button
-                  onClick={handleDeleteAccount}
+                  onClick={() => handleDeleteAccount(user.profilePicture)}
                   className="flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white py-3 px-6 rounded-lg transition duration-300"
                 >
                   <Trash2 className="w-5 h-5" />

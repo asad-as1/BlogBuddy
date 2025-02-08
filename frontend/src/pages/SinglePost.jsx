@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Container } from "../components";
+import { getStorage, ref, deleteObject } from "firebase/storage"
 import parse from "html-react-parser";
 import axios from "axios";
 import Cookie from "cookies-js";
@@ -278,7 +279,8 @@ const RemoveFromFavorites = async (e) => {
     }
   };
 
-  const deletePost = async () => {
+  const deletePost = async (fileUrl) => {
+    // console.log(fileUrl)
     const result = await MySwal.fire({
       title: 'Are you sure?',
       text: "This action cannot be undone!",
@@ -292,10 +294,22 @@ const RemoveFromFavorites = async (e) => {
   
     if (result.isConfirmed) {
       try {
+        // Delete post from backend
         await axios.delete(`${import.meta.env.VITE_URL}post/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
+  
+        // Delete file from Firebase Storage
+        if (fileUrl) {
+          const storage = getStorage();
+          const filePath = decodeURIComponent(fileUrl.split("/").pop().split("?")[0]);
+          // const filePath = decodedUrl; // Extract path from URL
+          const fileRef = ref(storage, filePath);
+  
+          await deleteObject(fileRef);
+        }
+  
         MySwal.fire({
           icon: 'success',
           title: 'Deleted!',
@@ -303,6 +317,7 @@ const RemoveFromFavorites = async (e) => {
           confirmButtonText: 'OK',
           confirmButtonColor: "#007BFF",
         });
+  
         navigate("/");
       } catch (error) {
         setErrorMessage("It seems you're not connected to the internet. Check your connection and retry."); // Set error message
@@ -450,7 +465,7 @@ const RemoveFromFavorites = async (e) => {
                   <Button
                     bgColor="bg-red-500"
                     className="mb-3 md:mb-0 h-10 px-4"
-                    onClick={deletePost}
+                    onClick={() => deletePost(post?.media?.url)}
                   >
                     Delete
                   </Button>

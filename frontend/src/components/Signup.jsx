@@ -2,21 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Input } from "./index.js";
 import { useForm } from "react-hook-form";
-import { login } from "./Login.jsx";
+import { login } from "./Login.jsx"; // Ensure correct import
 import { upload } from "../firebase.js";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Swal from "sweetalert2";
-import Side from "./Side.jsx"
+import Side from "./Side.jsx";
+import { getStorage, ref, deleteObject } from "firebase/storage"
 
 
-function Signup({ user, location }) {
+function Signup({ user }) {
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues: {
       username: "",
@@ -25,10 +26,12 @@ function Signup({ user, location }) {
       bio: "",
     },
   });
-  
+
   const token = Cookie.get("token");
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadTime, setUploadTime] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -40,14 +43,45 @@ function Signup({ user, location }) {
         bio: user.bio || "",
       });
     }
-  }, [user, reset]);
+  }, [user]);
 
   const handleRegister = async (data) => {
     try {
       // Upload profile picture if provided
       if (data.profilePicture && data.profilePicture.length > 0) {
         const file = data.profilePicture[0];
-        const url = await upload(file);
+  
+        // Validate if the file is an image
+        if (!file.type.startsWith("image/")) {
+          await Swal.fire({
+            icon: "error",
+            title: "Invalid File Type",
+            text: "Only image files are allowed for the profile picture.",
+            confirmButtonText: "OK",
+            confirmButtonColor: "#007BFF",
+          });
+          return; // Stop execution
+        }
+  
+        // Delete previous profile picture if exists
+        if (user?.profilePicture) {
+          const prevImageUrl = user.profilePicture;
+          const storageRef = getStorage();
+          const imageRef = ref(storageRef, prevImageUrl);
+          await deleteObject(imageRef).catch((error) => {
+            console.error("Error deleting previous profile picture:", error);
+          });
+        }
+  
+        const startTime = Date.now();
+  
+        // Upload new profile picture
+        const url = await upload(file, (progress) => {
+          setUploadProgress(progress);
+        });
+  
+        const endTime = Date.now();
+        setUploadTime(((endTime - startTime) / 1000).toFixed(2));
         data.profilePicture = url;
       } else {
         data.profilePicture = user?.profilePicture || "";
@@ -55,7 +89,6 @@ function Signup({ user, location }) {
   
       let res;
       if (user) {
-        // Update user profile
         res = await axios.put(`${import.meta.env.VITE_URL}user/profile`, data, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
@@ -72,7 +105,6 @@ function Signup({ user, location }) {
           });
         }
       } else {
-        // Register new user
         res = await axios.post(`${import.meta.env.VITE_URL}user/register`, data);
         if (res?.status === 201) {
           await Swal.fire({
@@ -97,15 +129,17 @@ function Signup({ user, location }) {
       });
     }
   };
+  
 
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
+
   return (
     <div className="min-h-screen flex flex-col lg:flex-row -mt-10">
       {/* Left Side - Website Description */}
-      <Side/>
-  
+      <Side />
+
       {/* Right Side - Signup Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
         <div className="bg-white w-full max-w-md rounded-xl p-8 shadow-lg border border-gray-200">
@@ -125,7 +159,7 @@ function Signup({ user, location }) {
               </p>
             </div>
           )}
-  
+
           {user && (
             <div className="mb-6 text-center">
               <h2 className="text-2xl font-bold text-gray-800">
@@ -133,24 +167,20 @@ function Signup({ user, location }) {
               </h2>
             </div>
           )}
-  
+
           <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
             {!user && (
               <Input
                 label="Username: "
                 placeholder="Username"
-                {...register("username", {
-                  required: true,
-                })}
+                {...register("username", { required: true })}
                 className="w-full"
               />
             )}
             <Input
               label="Full Name: "
               placeholder="Enter your full name"
-              {...register("name", {
-                required: true,
-              })}
+              {...register("name", { required: true })}
               className="w-full"
             />
             <Input
@@ -162,7 +192,7 @@ function Signup({ user, location }) {
                 validate: {
                   matchPattern: (value) =>
                     /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                    "Email address must be a valid address",
+                    "Email address must be valid",
                 },
               })}
               className="w-full"
@@ -211,29 +241,32 @@ function Signup({ user, location }) {
               label="Bio: "
               type="text"
               placeholder="Enter your Bio"
-              {...register("bio", {
-                required: false,
-              })}
+              {...register("bio")}
               className="w-full"
             />
-            {user && user.profilePicture && (
-              <div className="text-center">
-                <img
-                  src={user.profilePicture}
-                  alt="Profile"
-                  className="mb-2 rounded-full h-24 w-24 mx-auto"
-                />
-                <p className="text-gray-500">Current Profile Picture</p>
-              </div>
-            )}
             <Input
               label="Profile Picture"
               type="file"
-              {...register("profilePicture", {
-                required: false,
-              })}
+              {...register("profilePicture")}
               className="w-full"
             />
+             {/* Upload Progress UI */}
+             {uploadProgress > 0 && (
+              <div className="w-full mb-4">
+                <p className="text-gray-700 font-medium">
+                  Uploading: {uploadProgress}%
+                </p>
+                {uploadTime && (
+                  <p className="text-gray-500">Time taken: {uploadTime} seconds</p>
+                )}
+                <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                  <div
+                    className="bg-blue-500 h-2 rounded-full"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
             <Button type="submit" className="w-full mt-4">
               {user ? "Save Changes" : "Create Account"}
             </Button>
@@ -242,7 +275,6 @@ function Signup({ user, location }) {
       </div>
     </div>
   );
-  
 }
 
 export default Signup;

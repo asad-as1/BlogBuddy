@@ -5,7 +5,10 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Cookie from "cookies-js";
 import { upload } from "../../firebase";
-import Swal from 'sweetalert2'; // Import SweetAlert
+import Swal from 'sweetalert2'; 
+import { getStorage, ref, deleteObject } from "firebase/storage"
+
+
 
 export default function PostForm({ post }) {
   const { register, handleSubmit, setValue, control, getValues, formState: { errors }, setError } = useForm({
@@ -31,65 +34,77 @@ export default function PostForm({ post }) {
       setFileError("Featured media is required");
       return;
     }
-
+  
     if (!data.content) {
       setError("content", { type: "required", message: "Content is required" });
       return;
     }
-
+  
     try {
+      let newMedia = post?.media || null;
+  
+      // If a new media file is uploaded
       if (data.media) {
+        // Delete previous media if it exists
+        if (post?.media?.url) {
+          const storageRef = getStorage();
+          const oldMediaRef = ref(storageRef, post.media.url);
+          await deleteObject(oldMediaRef).catch((error) => {
+            console.error("Error deleting previous media:", error);
+          });
+        }
+  
+        // Upload new media
         const startTime = Date.now();
         const url = await upload(data.media, (progress) => {
           setUploadProgress(progress);
         });
         const endTime = Date.now();
         const timeTaken = ((endTime - startTime) / 1000).toFixed(2);
-
-        data.media = {
+  
+        newMedia = {
           url: url,
           isVideo: isVideo,
         };
         setUploadTime(timeTaken);
-      } else if (post) {
-        data.media = post.media;
       }
-
+  
+      const postData = { ...data, media: newMedia };
+  
       if (post) {
-        await axios.put(`${import.meta.env.VITE_URL}post/${post._id}`, data, {
+        await axios.put(`${import.meta.env.VITE_URL}post/${post._id}`, postData, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         Swal.fire({
-          icon: 'success',
-          title: 'Post Updated',
-          text: 'Your post has been updated successfully!',
-          confirmButtonColor: '#3085d6', // Set the OK button color to blue
+          icon: "success",
+          title: "Post Updated",
+          text: "Your post has been updated successfully!",
+          confirmButtonColor: "#3085d6",
         });
       } else {
-        await axios.post(`${import.meta.env.VITE_URL}post/newPost`, data, {
+        await axios.post(`${import.meta.env.VITE_URL}post/newPost`, postData, {
           headers: { Authorization: `Bearer ${token}` },
           withCredentials: true,
         });
         Swal.fire({
-          icon: 'success',
-          title: 'Post Created',
-          text: 'Your post has been created successfully!',
-          confirmButtonColor: '#3085d6', // Set the OK button color to blue
+          icon: "success",
+          title: "Post Created",
+          text: "Your post has been created successfully!",
+          confirmButtonColor: "#3085d6",
         });
       }
-
+  
       navigate("/");
     } catch (error) {
       console.error("Error submitting post:", error);
       setErrorMessage("There was an error submitting the post. Please try again.");
-      
-      // Show SweetAlert on error
+  
       Swal.fire({
-        icon: 'error',
-        title: 'Oops...',
-        text: 'There was an error submitting the post. Please try again.',
-        confirmButtonColor: '#d33', // Keep this red for error
+        icon: "error",
+        title: "Oops...",
+        text: "There was an error submitting the post. Please try again.",
+        confirmButtonColor: "#d33",
       });
     }
   };

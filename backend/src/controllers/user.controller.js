@@ -135,12 +135,11 @@ exports.getUserById = async (req, res) => {
 // Update user profile
 exports.updateProfile = async (req, res) => {
   try {
-    const { _id, username, name, bio, profilePicture } = req.body;
-    // console.log(_id.toString())
+    const { _id, username, name, bio, profilePicture, email } = req.body;
 
     const updatedUser = await User.findByIdAndUpdate(
       _id.toString(),
-      { username, name, bio, profilePicture },
+      {  name, bio, profilePicture, email },
       { new: true, runValidators: true }
     ).select('-password'); // Exclude the password field
 
