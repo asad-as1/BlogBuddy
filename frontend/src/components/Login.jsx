@@ -33,6 +33,8 @@ export const login = async (data, navigate, setError, from) => {
     Swal.fire({
       icon: "error",
       title: "Login Failed",
+      timer: 1500,
+      showConfirmButton: false,
       text: error.response?.data?.message || "Login failed. Please try again.",
     });
     setError(error.response?.data?.message || "Login failed. Please try again.");
